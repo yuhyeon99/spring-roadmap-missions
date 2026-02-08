@@ -1,10 +1,10 @@
-package hello.core;
+package com.goorm.springbootintroproject;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CoreApplicationTests {
+class SpringBootIntroProjectApplicationTests {
 
 	@Test
 	void contextLoads() {

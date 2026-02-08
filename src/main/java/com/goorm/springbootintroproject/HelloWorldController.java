@@ -1,4 +1,4 @@
-package hello.core;
+package com.goorm.springbootintroproject;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
