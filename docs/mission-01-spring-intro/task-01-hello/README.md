@@ -1,15 +1,15 @@
 # Spring Boot "Hello, World!" API 설정
 
-이 문서는 현재 Spring Boot 프로젝트에서 기본적인 "Hello, World!" REST API 엔드포인트를 설정하는 단계를 설명합니다.
+이 문서는 Spring 입문 미션(`mission-01-spring-intro`)의 첫 번째 테스크(`task-01-hello`)에서 기본적인 "Hello, World!" REST API 엔드포인트를 설정한 과정을 정리합니다.
 
 ## 1. 컨트롤러 구현
 
-`src/main/java/hello/core/` 디렉토리에 `HelloWorldController.java` 파일이 생성되었습니다. 이 컨트롤러는 Spring의 `@RestController` 및 `@GetMapping` 어노테이션을 사용하여 간단한 엔드포인트를 노출합니다.
+`src/main/java/com/goorm/springbootintroproject/mission01_spring_intro/task01_hello/` 디렉토리에 `HelloWorldController.java` 파일이 생성되었습니다. 이 컨트롤러는 Spring의 `@RestController` 및 `@GetMapping` 어노테이션을 사용하여 간단한 엔드포인트를 노출합니다.
 
-**파일: `src/main/java/hello/core/HelloWorldController.java`**
+**파일: `src/main/java/com/goorm/springbootintroproject/mission01_spring_intro/task01_hello/HelloWorldController.java`**
 
 ```java
-package hello.core;
+package com.goorm.springbootintroproject.mission01_spring_intro.task01_hello;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

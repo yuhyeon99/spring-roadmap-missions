@@ -8,7 +8,7 @@
 
 현재 프로젝트에서 다루는 주요 학습 내용과 진행 상황은 다음과 같습니다.
 
-*   **[간단한 웹 페이지와 REST API 엔드포인트 구현](docs/api_setup.md)** (완료)
+*   **[간단한 웹 페이지와 REST API 엔드포인트 구현](docs/mission-01-spring-intro/task-01-hello/README.md)** (미션 01, 완료)
     *   "Hello, World!" 메시지를 반환하는 간단한 REST API (`/hello`)를 구현했습니다.
 *   **의존성 주입(DI) 이해하기** ((예정))
 *   **MVC 패턴의 이해와 기본 구조 설계** ((예정))
@@ -66,6 +66,6 @@
 
 ## 학습 자료
 
-각 학습 주제에 대한 더 자세한 설명과 코드 구현 과정은 `docs/` 디렉토리에 있는 Markdown 파일들을 참조해주세요.
+각 학습 주제에 대한 더 자세한 설명과 코드 구현 과정은 `docs/mission-xx-.../task-xx-.../` 디렉토리에 있는 Markdown 파일들을 참조해주세요.
 
-*   [`docs/api_setup.md`](docs/api_setup.md): 간단한 웹 페이지와 REST API 엔드포인트 구현에 대한 자세한 설명과 핵심 개념(어노테이션, `build.gradle`, 의존성 등)을 학습할 수 있습니다.
+*   [`docs/mission-01-spring-intro/task-01-hello/README.md`](docs/mission-01-spring-intro/task-01-hello/README.md): 간단한 웹 페이지와 REST API 엔드포인트 구현에 대한 자세한 설명과 핵심 개념(어노테이션, `build.gradle`, 의존성 등)을 학습할 수 있습니다.
