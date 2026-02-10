@@ -4,12 +4,12 @@
 
 ## 1. 컨트롤러 구현
 
-`src/main/java/com/goorm/springbootintroproject/mission01_spring_intro/task01_hello/` 디렉토리에 `HelloWorldController.java` 파일이 생성되었습니다. 이 컨트롤러는 Spring의 `@RestController` 및 `@GetMapping` 어노테이션을 사용하여 간단한 엔드포인트를 노출합니다.
+`src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task01_hello/` 디렉토리에 `HelloWorldController.java` 파일이 생성되었습니다. 이 컨트롤러는 Spring의 `@RestController` 및 `@GetMapping` 어노테이션을 사용하여 간단한 엔드포인트를 노출합니다.
 
-**파일: `src/main/java/com/goorm/springbootintroproject/mission01_spring_intro/task01_hello/HelloWorldController.java`**
+**파일: `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task01_hello/HelloWorldController.java`**
 
 ```java
-package com.goorm.springbootintroproject.mission01_spring_intro.task01_hello;
+package com.goorm.springmissionsplayground.mission01_spring_intro.task01_hello;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

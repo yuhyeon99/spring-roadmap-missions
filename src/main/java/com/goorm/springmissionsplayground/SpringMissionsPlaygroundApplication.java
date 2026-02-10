@@ -1,13 +1,13 @@
-package com.goorm.springbootintroproject;
+package com.goorm.springmissionsplayground;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringBootIntroProjectApplication {
+public class SpringMissionsPlaygroundApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringBootIntroProjectApplication.class, args);
+		SpringApplication.run(SpringMissionsPlaygroundApplication.class, args);
 	}
 
 }

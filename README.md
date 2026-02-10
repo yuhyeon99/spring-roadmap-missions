@@ -1,4 +1,4 @@
-# spring-boot-intro-project
+# spring-missions-playground
 
 ## 프로젝트 소개
 

@@ -1,10 +1,10 @@
-package com.goorm.springbootintroproject;
+package com.goorm.springmissionsplayground;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SpringBootIntroProjectApplicationTests {
+class SpringMissionsPlaygroundApplicationTests {
 
 	@Test
 	void contextLoads() {
