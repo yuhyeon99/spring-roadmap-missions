@@ -73,9 +73,10 @@ Hello, World!
 http://localhost:8080/hello
 ```
 
-**예상 결과 (스크린샷):**
+**결과 (스크린샷):**
 
-브라우저에 "Hello, World!" 텍스트가 표시됩니다. 제출을 위해 이 출력의 스크린샷을 찍어주세요.
+<img width="424" height="149" alt="image" src="https://github.com/user-attachments/assets/f255d537-89da-47f7-884b-3425ada38d8a" />
+
 
 ---
 
