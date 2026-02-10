@@ -1,4 +1,7 @@
 ../core/HELP.md
+.DS_Store
+*.zip
+/scripts/
 
 # Gradle & build outputs
 /.gradle/
