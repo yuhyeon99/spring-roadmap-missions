@@ -5,6 +5,7 @@
 
 # Gradle & build outputs
 /.gradle/
+/.gradle-tmp/
 /build/
 /out/
 /bin/
