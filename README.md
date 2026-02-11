@@ -34,7 +34,7 @@ REST API 구현, MVC 패턴, DI, JPA, 트랜잭션, AOP 등 스프링 부트의 
 
 * [x] **[간단한 웹 페이지와 REST API 엔드포인트 구현](docs/mission-01-spring-intro/task-01-hello/README.md)**
 * [x] **[MVC 패턴의 이해와 기본 구조 설계](docs/mission-01-spring-intro/task-02-mvc/README.md)**
-* [ ] 의존성 주입(DI) 이해하기
+* [x] **[의존성 주입(DI) 이해하기](docs/mission-01-spring-intro/task-03-di/README.md)**
 * [ ] JPA와 스프링 데이터의 기본 CRUD 구현
 * [ ] 트랜잭션 관리 설정하기
 * [ ] AOP 적용하여 로깅 기능 추가하기
