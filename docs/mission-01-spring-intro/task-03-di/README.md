@@ -164,7 +164,7 @@ curl -X POST \
 ./gradlew test --tests "*task03_di*"
 ```
 
-## 학습 내용 (스프링 초심자 관점)
+## 학습 내용
 
 - **@Component 스캔**: `@Component`, `@Service`, `@Repository`를 사용하면 스프링이 빈으로 등록합니다. 패키지 하위에 있으면 `@SpringBootApplication`의 컴포넌트 스캔 대상이 됩니다.
 - **생성자 주입 + @Autowired**: `NotificationService`는 생성자에 `@Autowired`를 붙여 의존성을 주입받습니다. 파라미터가 하나뿐이어도 기본으로 동작하지만, 명시하면 의도가 분명해집니다.

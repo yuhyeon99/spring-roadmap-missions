@@ -45,3 +45,7 @@ out/
 
 ### VS Code ###
 .vscode/
+AGENTS.md
+
+.gradle
+build/
