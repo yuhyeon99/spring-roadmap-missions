@@ -55,10 +55,9 @@
 ### API 호출 예시 (`/mission01/task04/members`)
 1) 회원 생성  
 ```bash
-curl -i -X POST \\
-  -H \"Content-Type: application/json\" \\
-  -d '{\"name\":\"JPA User\",\"email\":\"jpa@example.com\"}' \\
-  http://localhost:8080/mission01/task04/members
+curl -i -X POST http://localhost:8080/mission01/task04/members \
+    -H "Content-Type: application/json" \
+    -d '{"name":"JPA User","email":"jpa@example.com"}'
 ```
 
 2) 전체 조회  
@@ -73,16 +72,17 @@ curl http://localhost:8080/mission01/task04/members/1
 
 4) 수정  
 ```bash
-curl -X PUT \\
-  -H \"Content-Type: application/json\" \\
-  -d '{\"name\":\"Updated\",\"email\":\"updated@example.com\"}' \\
-  http://localhost:8080/mission01/task04/members/1
+curl -X PUT http://localhost:8080/mission01/task04/members/1 \
+    -H "Content-Type: application/json" \
+    -d '{"name":"Updated","email":"updated@example.com"}'
 ```
 
 5) 삭제  
 ```bash
 curl -X DELETE http://localhost:8080/mission01/task04/members/1
 ```
+
+![img.png](img.png)
 
 ## 4. 학습 내용
 - **Spring Data JPA**: `JpaRepository` 상속만으로 CRUD 메서드가 자동 제공됩니다. 복잡한 SQL을 작성하지 않아도 되고, 필요 시 메서드 이름 기반 쿼리 또는 @Query로 확장할 수 있습니다.

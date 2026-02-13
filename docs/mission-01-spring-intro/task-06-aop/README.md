@@ -33,6 +33,8 @@ curl http://localhost:8080/mission01/task05/members
 [AOP][MemberTxService.findAll(..)] executed in 3 ms
 ```
 
+![img.png](img.png)
+
 ## 4. 학습 내용
 - **AOP 개념**: 핵심 로직과 부가 기능(로깅)을 분리해 관심사 분리(SoC)를 실현한다.
 - **@Around 사용 이유**: 메서드 실행 전후를 모두 다루고 반환값/예외 흐름을 제어할 수 있어 시간 측정에 적합하다.

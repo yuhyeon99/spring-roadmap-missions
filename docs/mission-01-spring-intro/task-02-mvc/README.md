@@ -141,6 +141,8 @@ curl http://localhost:8080/mission01/task02/members
 curl http://localhost:8080/mission01/task02/members/1
 ```
 
+![img.png](img.png)
+
 ## 학습 내용
 
 - **MVC 분리**: 컨트롤러는 HTTP 요청/응답을 다루고, 서비스는 비즈니스 로직을, 리포지토리는 데이터 접근을 담당합니다. 역할을 나누면 변경 영향 범위가 작아집니다.

@@ -136,6 +136,8 @@ curl -X POST \
 {"results":["[EMAIL] [2026-02-10 21:41:49] Hello DI","[SMS] [2026-02-10 21:41:49] Hello DI"]}
 ```
 
+![img.png](img.png)
+
 ## 학습 내용
 
 - **@Component 스캔**: `@Component`, `@Service`, `@Repository`를 사용하면 스프링이 빈으로 등록합니다. 패키지 하위에 있으면 `@SpringBootApplication`의 컴포넌트 스캔 대상이 됩니다.
