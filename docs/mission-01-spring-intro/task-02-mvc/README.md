@@ -111,38 +111,7 @@ public class InMemoryMemberRepository implements MemberRepository {
 }
 ```
 
-### 단위 테스트
-
-**파일: `src/test/java/com/goorm/springmissionsplayground/mission01_spring_intro/task02_mvc/MemberServiceTest.java`**
-
-```java
-class MemberServiceTest {
-
-    private final MemberService memberService = new MemberService(new InMemoryMemberRepository());
-
-    @Test
-    void createAndFindMember() {
-        Member created = memberService.createMember("Alice", "alice@example.com");
-
-        assertThat(created.getId()).isNotNull();
-        assertThat(created.getName()).isEqualTo("Alice");
-
-        Member found = memberService.findMember(created.getId()).orElseThrow();
-        assertThat(found.getEmail()).isEqualTo("alice@example.com");
-    }
-
-    @Test
-    void listMembers() {
-        memberService.createMember("Bob", "bob@example.com");
-        memberService.createMember("Carol", "carol@example.com");
-
-        List<Member> members = memberService.listMembers();
-        assertThat(members).hasSize(2);
-    }
-}
-```
-
-## 3. 실행 및 테스트 방법
+## 3. 실행 방법
 
 ### 애플리케이션 실행
 
@@ -170,12 +139,6 @@ curl http://localhost:8080/mission01/task02/members
 3. 특정 회원 조회 (GET)
 ```bash
 curl http://localhost:8080/mission01/task02/members/1
-```
-
-### 테스트 실행
-
-```bash
-./gradlew test --tests "*task02_mvc*"
 ```
 
 ## 학습 내용

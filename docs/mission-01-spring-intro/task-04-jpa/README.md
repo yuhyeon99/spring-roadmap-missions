@@ -45,7 +45,7 @@
 - `spring.jpa.show-sql=true`, `hibernate.format_sql=true`로 SQL 로그 확인 가능
 - 개발 편의를 위해 H2 콘솔 `/h2-console` 활성화
 
-## 3. 실행 및 테스트
+## 3. 실행
 
 ### 애플리케이션 실행
 ```bash
@@ -82,11 +82,6 @@ curl -X PUT \\
 5) 삭제  
 ```bash
 curl -X DELETE http://localhost:8080/mission01/task04/members/1
-```
-
-### 테스트 실행
-```bash
-./gradlew test --tests \"*task04_jpa*\"
 ```
 
 ## 4. 학습 내용

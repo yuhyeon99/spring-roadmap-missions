@@ -33,7 +33,7 @@
   - `GET /mission01/task05/members` : 전체 조회
   - `GET /mission01/task05/members/{id}` : 단건 조회
 
-## 3. 실행 및 테스트
+## 3. 실행
 
 ### 애플리케이션 실행
 ```bash
@@ -58,12 +58,6 @@ curl -i -X POST \
 ```
 - 응답 상태: 500  
 - 이후 `GET /mission01/task05/members` 결과에 저장된 데이터가 없어야 롤백이 확인됩니다.
-
-### 테스트 실행
-```bash
-./gradlew test --tests "*task05_tx*"
-```
-(네트워크/권한 문제로 Gradle 다운로드가 불가능한 환경에서는 실패할 수 있습니다. 로컬에서 Gradle 캐시가 있는 경우 정상 실행됩니다.)
 
 ## 4. 학습 내용
 - **@Transactional 기본 동작**: 런타임 예외 발생 시 트랜잭션이 자동 롤백됩니다. 체크 예외는 기본적으로 커밋되므로 필요 시 rollbackFor 옵션을 사용합니다.

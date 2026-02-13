@@ -111,29 +111,7 @@ public class NotificationResponse {
 }
 ```
 
-### 단위 테스트
-
-**파일: `src/test/java/com/goorm/springmissionsplayground/mission01_spring_intro/task03_di/NotificationServiceTest.java`**
-
-```java
-@SpringBootTest
-class NotificationServiceTest {
-
-    @Autowired
-    private NotificationService notificationService;
-
-    @Test
-    void notifyAllChannels_formatsMessageAndUsesAllSenders() {
-        List<String> results = notificationService.notifyAllChannels("Test message");
-
-        assertThat(results).hasSizeGreaterThanOrEqualTo(2);
-        assertThat(results).anyMatch(msg -> msg.contains("EMAIL"));
-        assertThat(results).anyMatch(msg -> msg.contains("SMS"));
-    }
-}
-```
-
-## 3. 실행 및 테스트
+## 3. 실행
 
 ### 애플리케이션 실행
 
@@ -158,16 +136,9 @@ curl -X POST \
 {"results":["[EMAIL] [2026-02-10 21:41:49] Hello DI","[SMS] [2026-02-10 21:41:49] Hello DI"]}
 ```
 
-### 테스트 실행
-
-```bash
-./gradlew test --tests "*task03_di*"
-```
-
 ## 학습 내용
 
 - **@Component 스캔**: `@Component`, `@Service`, `@Repository`를 사용하면 스프링이 빈으로 등록합니다. 패키지 하위에 있으면 `@SpringBootApplication`의 컴포넌트 스캔 대상이 됩니다.
 - **생성자 주입 + @Autowired**: `NotificationService`는 생성자에 `@Autowired`를 붙여 의존성을 주입받습니다. 파라미터가 하나뿐이어도 기본으로 동작하지만, 명시하면 의도가 분명해집니다.
 - **컬렉션 주입**: 인터페이스 타입(`List<NotificationSender>`)으로 받으면 구현체 여러 개가 자동으로 주입됩니다. 새 채널을 추가해도 서비스 코드를 건드리지 않고 확장 가능합니다.
 - **단일 책임 분리**: 메시지 포맷팅(`MessageFormatter`)과 전송(`NotificationSender` 구현들)을 분리하여 테스트와 변경이 쉬워집니다.
-- **테스트에서 DI 검증**: `@SpringBootTest`로 전체 컨텍스트를 올려 실제 빈 주입이 정상인지 확인했습니다.
