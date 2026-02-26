@@ -58,7 +58,7 @@ DI, IoC, AOP의 동작 원리와 스프링 컨테이너, 빈 생명주기, 스�
 * [ ] 인터페이스를 사용하여 의존성 주입하기
 * [x] **[의존관계 자동 주입 방식 실습(@Autowired, @Qualifier, @Primary)](docs/mission-02-spring-core-basic/task-04-auto-injection/README.md)**
 * [ ] 싱글톤 컨테이너 원리 이해하기
-* [ ] 싱글톤 빈 스코프와 프로토타입 빈 스코프 구현하기
+* [x] **[싱글톤 빈 스코프와 프로토타입 빈 스코프 구현하기](docs/mission-02-spring-core-basic/task-07-singleton-prototype-scope/README.md)**
 * [ ] 스프링 웹 스코프를 활용하여 빈 생성하기
 * [x] **[순환 의존성 해결하기](docs/mission-02-spring-core-basic/task-02-circular-dependency/README.md)**
 * [ ] AOP를 사용하여 애스펙트 구현하기
