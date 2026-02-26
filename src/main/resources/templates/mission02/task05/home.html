@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission02 Task05 - Spring MVC Page</title>
+    <style>
+        :root {
+            --bg-top: #f5efe6;
+            --bg-bottom: #d6e9f8;
+            --card: #ffffff;
+            --title: #1f2a44;
+            --body: #374151;
+            --accent: #cc5a2b;
+            --accent-soft: #ffe4d6;
+            --border: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Gowun Dodum", "Noto Sans KR", sans-serif;
+            color: var(--body);
+            background: linear-gradient(155deg, var(--bg-top), var(--bg-bottom));
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+
+        .layout {
+            width: min(880px, 100%);
+            display: grid;
+            gap: 20px;
+            animation: float-in 0.5s ease-out;
+        }
+
+        .hero {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 28px;
+            border: 1px solid var(--border);
+            box-shadow: 0 14px 30px rgba(17, 24, 39, 0.1);
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            color: var(--title);
+            font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.85rem;
+            background: var(--accent-soft);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 999px;
+            margin-bottom: 12px;
+        }
+
+        .welcome {
+            margin: 8px 0 0;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: var(--card);
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            padding: 22px;
+        }
+
+        .panel h2 {
+            margin: 0 0 14px;
+            color: var(--title);
+            font-size: 1.1rem;
+        }
+
+        ul {
+            margin: 0;
+            padding-left: 18px;
+            line-height: 1.7;
+        }
+
+        form {
+            display: grid;
+            gap: 12px;
+        }
+
+        label {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        input {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-size: 1rem;
+        }
+
+        button {
+            border: 0;
+            border-radius: 12px;
+            padding: 11px 14px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(120deg, #ca6f1f, #dc2626);
+            cursor: pointer;
+        }
+
+        .meta {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .notice {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #0f766e;
+        }
+
+        @media (max-width: 760px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .hero,
+            .panel {
+                padding: 18px;
+            }
+        }
+
+        @keyframes float-in {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+<main class="layout">
+    <section class="hero">
+        <span class="badge">Mission02 Task05</span>
+        <h1>Spring MVC 간단 웹 페이지</h1>
+        <p class="welcome" th:text="${welcomeMessage}">
+            학습자님, Spring MVC 학습을 위한 MVC 데모 페이지입니다.
+        </p>
+        <p class="meta">
+            현재 선택한 주제: <strong th:text="${topic}">Spring MVC</strong> |
+            렌더링 시각: <strong th:text="${serverTime}">2026-02-26 20:10:00</strong>
+        </p>
+        <p class="notice" th:if="${submitted}">
+            폼 입력이 컨트롤러로 전달되어 Model 값이 갱신되었습니다.
+        </p>
+    </section>
+
+    <section class="grid">
+        <article class="panel">
+            <h2>학습 체크리스트</h2>
+            <ul>
+                <li th:each="item : ${learningChecklist}" th:text="${item}">Controller와 View 연결 확인</li>
+            </ul>
+        </article>
+
+        <article class="panel">
+            <h2>Model 데이터 바꿔보기</h2>
+            <form th:action="@{/mission02/task05/mvc/preview}" method="post" th:object="${learningRequest}">
+                <div>
+                    <label for="name">이름</label>
+                    <input id="name" type="text" th:field="*{name}" placeholder="예: 김스프링">
+                </div>
+                <div>
+                    <label for="topic">주제</label>
+                    <input id="topic" type="text" th:field="*{topic}" placeholder="예: Model/View 분리">
+                </div>
+                <button type="submit">Model 반영해서 다시 렌더링</button>
+            </form>
+            <p class="meta">현재 화면 기준 이름: <strong th:text="${displayName}">학습자</strong></p>
+        </article>
+    </section>
+</main>
+</body>
+</html>
