@@ -52,7 +52,7 @@ DI, IoC, AOP의 동작 원리와 스프링 컨테이너, 빈 생명주기, 스�
 ### 하위 테스크
 
 * [ ] 객체 지향 설계 원칙 이해하기
-* [ ] Spring을 통한 객체 지향 원리 적용 실습
+* [x] **[Spring을 통한 객체 지향 원리 적용 실습](docs/mission-02-spring-core-basic/task-08-object-oriented-principles/README.md)**
 * [x] **[스프링 부트를 사용하여 웹 애플리케이션 프로젝트 생성하기](docs/mission-02-spring-core-basic/task-06-spring-boot-web-project/README.md)**
 * [x] **[애너테이션을 사용하여 빈 주입하기](docs/mission-02-spring-core-basic/task-01-annotation-injection/README.md)**
 * [ ] 인터페이스를 사용하여 의존성 주입하기
