@@ -1,46 +1,47 @@
 # 스프링 핵심 원리 - 기본: 싱글톤 빈 스코프와 프로토타입 빈 스코프 구현하기
 
-이 문서는 `mission-02-spring-core-basic`의 `task-07-singleton-prototype-scope` 구현을 동일 포맷으로 정리한 보고서입니다.
-파일 경로 인덱스, 파일별 상세 설명, 핵심 개념 링크, 전체 코드 토글을 함께 제공합니다.
+이 문서는 `mission-02-spring-core-basic`의 `task-07-singleton-prototype-scope`를 수작업 기준으로 다시 정리한 보고서입니다.
+태스크별 의도와 코드 흐름을 중심으로 설명하고, 모든 관련 파일은 토글 코드 블록으로 확인할 수 있습니다.
 
 ## 1. 작업 개요
 
 - 미션/태스크: `mission-02-spring-core-basic` / `task-07-singleton-prototype-scope`
-- 소스 패키지: `com.goorm.springmissionsplayground.mission02_spring_core_basic.task07_singleton_prototype_scope`
-- 코드 파일 수(테스트 포함): **8개**
-- 주요 API 베이스 경로:
-  - `/mission02/task07/scopes` (ScopeComparisonController.java)
+- 목표:
+  - 싱글톤/프로토타입 빈의 인스턴스 재사용 차이를 실측한다.
+  - 직접 주입 vs `ObjectProvider` 조회 방식에서 프로토타입 동작 차이를 비교한다.
+  - 응답 DTO에 인스턴스 ID/카운트를 담아 재현 가능한 결과를 제공한다.
+- 엔드포인트: `GET /mission02/task07/scopes`
 
 ## 2. 코드 파일 경로 인덱스
 
-| 파일 경로 | 역할 |
-|---|---|
-| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/controller/ScopeComparisonController.java` | HTTP 요청을 받아 입력을 바인딩하고 서비스 결과를 응답으로 반환 |
-| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/dto/BeanTouchSnapshot.java` | 계층 간 데이터 전달 형식(요청/응답) |
-| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/dto/ScopeComparisonResponse.java` | 계층 간 데이터 전달 형식(요청/응답) |
-| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/dto/ScopePairResult.java` | 계층 간 데이터 전달 형식(요청/응답) |
-| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/scope/PrototypeScopeBean.java` | 빈 스코프별 인스턴스 동작 정의 |
-| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/scope/SingletonScopeBean.java` | 빈 스코프별 인스턴스 동작 정의 |
-| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/service/ScopeComparisonService.java` | 핵심 비즈니스 로직과 흐름 제어를 담당 |
-| `src/test/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/ScopeComparisonServiceTest.java` | 핵심 동작을 자동 검증하는 테스트 코드 |
+| 구분 | 파일 경로 | 역할 |
+|---|---|---|
+| Controller | `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/controller/ScopeComparisonController.java` | 요청 진입점(HTTP 매핑/응답 구성) |
+| DTO | `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/dto/BeanTouchSnapshot.java` | 요청/응답 데이터 구조 |
+| DTO | `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/dto/ScopeComparisonResponse.java` | 요청/응답 데이터 구조 |
+| DTO | `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/dto/ScopePairResult.java` | 요청/응답 데이터 구조 |
+| Scope | `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/scope/PrototypeScopeBean.java` | 빈 스코프 실습 컴포넌트 |
+| Scope | `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/scope/SingletonScopeBean.java` | 빈 스코프 실습 컴포넌트 |
+| Service | `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/service/ScopeComparisonService.java` | 비즈니스 로직과 흐름 제어 |
+| Test | `src/test/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/ScopeComparisonServiceTest.java` | 요구사항 검증 테스트 |
 
-## 3. 구현 흐름 요약
+## 3. 구현 단계와 주요 코드 해설
 
-1. 컨트롤러(있다면)에서 요청을 수신하고 입력을 DTO/파라미터로 변환합니다.
-2. 서비스 계층에서 핵심 규칙(검증, 계산, 트랜잭션, 정책 선택)을 수행합니다.
-3. 저장소/도메인 계층과 협력해 상태를 조회·변경하고 결과를 응답으로 반환합니다.
-4. 테스트 코드에서 정상/예외 흐름을 검증해 동작을 고정합니다.
+1. `SingletonScopeBean`과 `PrototypeScopeBean`에 식별자/카운터 상태를 두어 인스턴스 재사용 여부를 추적합니다.
+2. `ScopeComparisonService`가 세 가지 비교 케이스(싱글톤, 직접 주입 프로토타입, Provider 조회 프로토타입)를 계산합니다.
+3. `ScopeComparisonController`는 비교 결과를 JSON으로 제공해 반복 호출 시 차이를 바로 확인할 수 있습니다.
+4. 테스트는 인스턴스 ID 동일/상이 조건을 명시적으로 검증합니다.
 
 ## 4. 파일별 상세 설명 + 전체 코드
 
 ### 4.1 `ScopeComparisonController.java`
 
 - 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/controller/ScopeComparisonController.java`
-- 역할: HTTP 요청을 받아 입력을 바인딩하고 서비스 결과를 응답으로 반환
+- 역할: 요청 진입점(HTTP 매핑/응답 구성)
 - 상세 설명:
-- 요청 URI와 HTTP 메서드를 메서드에 매핑해 외부 진입점을 구성합니다.
-- 요청 DTO/파라미터를 검증 가능한 형태로 서비스 계층에 전달합니다.
-- 응답 상태 코드와 응답 DTO를 통해 API 계약을 고정합니다.
+- 기본 경로: `/mission02/task07/scopes`
+- 매핑 메서드: Get;
+- 컨트롤러는 입력을 바인딩하고 서비스 결과를 HTTP 응답 규약에 맞춰 반환합니다.
 
 <details>
 <summary><code>ScopeComparisonController.java</code> 전체 코드</summary>
@@ -76,10 +77,11 @@ public class ScopeComparisonController {
 ### 4.2 `BeanTouchSnapshot.java`
 
 - 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/dto/BeanTouchSnapshot.java`
-- 역할: 계층 간 데이터 전달 형식(요청/응답)
+- 역할: 요청/응답 데이터 구조
 - 상세 설명:
-- 요청/응답 전용 구조를 분리해 도메인 모델의 직접 노출을 방지합니다.
-- API 스펙 변경이 도메인 내부 구조에 전파되지 않도록 완충 계층 역할을 합니다.
+- 요청/응답 전용 타입을 분리해 API 계약을 안정적으로 유지합니다.
+- 도메인 객체 직접 노출을 피해서 내부 구조 변경 전파를 줄입니다.
+- 컨트롤러와 서비스 사이의 데이터 경계를 명확히 만듭니다.
 
 <details>
 <summary><code>BeanTouchSnapshot.java</code> 전체 코드</summary>
@@ -112,10 +114,11 @@ public class BeanTouchSnapshot {
 ### 4.3 `ScopeComparisonResponse.java`
 
 - 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/dto/ScopeComparisonResponse.java`
-- 역할: 계층 간 데이터 전달 형식(요청/응답)
+- 역할: 요청/응답 데이터 구조
 - 상세 설명:
-- 요청/응답 전용 구조를 분리해 도메인 모델의 직접 노출을 방지합니다.
-- API 스펙 변경이 도메인 내부 구조에 전파되지 않도록 완충 계층 역할을 합니다.
+- 요청/응답 전용 타입을 분리해 API 계약을 안정적으로 유지합니다.
+- 도메인 객체 직접 노출을 피해서 내부 구조 변경 전파를 줄입니다.
+- 컨트롤러와 서비스 사이의 데이터 경계를 명확히 만듭니다.
 
 <details>
 <summary><code>ScopeComparisonResponse.java</code> 전체 코드</summary>
@@ -158,10 +161,11 @@ public class ScopeComparisonResponse {
 ### 4.4 `ScopePairResult.java`
 
 - 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/dto/ScopePairResult.java`
-- 역할: 계층 간 데이터 전달 형식(요청/응답)
+- 역할: 요청/응답 데이터 구조
 - 상세 설명:
-- 요청/응답 전용 구조를 분리해 도메인 모델의 직접 노출을 방지합니다.
-- API 스펙 변경이 도메인 내부 구조에 전파되지 않도록 완충 계층 역할을 합니다.
+- 요청/응답 전용 타입을 분리해 API 계약을 안정적으로 유지합니다.
+- 도메인 객체 직접 노출을 피해서 내부 구조 변경 전파를 줄입니다.
+- 컨트롤러와 서비스 사이의 데이터 경계를 명확히 만듭니다.
 
 <details>
 <summary><code>ScopePairResult.java</code> 전체 코드</summary>
@@ -225,10 +229,11 @@ public class ScopePairResult {
 ### 4.5 `PrototypeScopeBean.java`
 
 - 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/scope/PrototypeScopeBean.java`
-- 역할: 빈 스코프별 인스턴스 동작 정의
+- 역할: 빈 스코프 실습 컴포넌트
 - 상세 설명:
-- 스코프에 따라 빈 생성/재사용 시점이 어떻게 달라지는지 실습합니다.
-- 동일 빈 재사용 여부를 상태값으로 추적해 동작 차이를 검증합니다.
+- 태스크 동작에 필요한 구성요소로, 상위 계층과의 연결 지점을 담당합니다.
+- 단일 책임 원칙을 유지해 변경 시 영향 범위를 줄입니다.
+- 테스트 코드와 함께 읽으면 설계 의도를 더 명확히 파악할 수 있습니다.
 
 <details>
 <summary><code>PrototypeScopeBean.java</code> 전체 코드</summary>
@@ -261,10 +266,11 @@ public class PrototypeScopeBean {
 ### 4.6 `SingletonScopeBean.java`
 
 - 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/scope/SingletonScopeBean.java`
-- 역할: 빈 스코프별 인스턴스 동작 정의
+- 역할: 빈 스코프 실습 컴포넌트
 - 상세 설명:
-- 스코프에 따라 빈 생성/재사용 시점이 어떻게 달라지는지 실습합니다.
-- 동일 빈 재사용 여부를 상태값으로 추적해 동작 차이를 검증합니다.
+- 태스크 동작에 필요한 구성요소로, 상위 계층과의 연결 지점을 담당합니다.
+- 단일 책임 원칙을 유지해 변경 시 영향 범위를 줄입니다.
+- 테스트 코드와 함께 읽으면 설계 의도를 더 명확히 파악할 수 있습니다.
 
 <details>
 <summary><code>SingletonScopeBean.java</code> 전체 코드</summary>
@@ -296,11 +302,11 @@ public class SingletonScopeBean {
 ### 4.7 `ScopeComparisonService.java`
 
 - 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/service/ScopeComparisonService.java`
-- 역할: 핵심 비즈니스 로직과 흐름 제어를 담당
+- 역할: 비즈니스 로직과 흐름 제어
 - 상세 설명:
-- 비즈니스 규칙을 한 곳에 모아 컨트롤러와 저장소 책임을 분리합니다.
-- 트랜잭션 경계, 예외 처리, 정책 선택 같은 핵심 흐름을 제어합니다.
-- 테스트 시 서비스 단위로 핵심 동작을 검증하기 쉬운 구조를 제공합니다.
+- 핵심 공개 메서드: `public class ScopeComparisonService {,    public ScopeComparisonService(,    public ScopeComparisonResponse compare() {,`
+- 서비스 계층에서 검증, 계산, 상태 변경, 예외 처리를 집중 관리합니다.
+- 컨트롤러/저장소 사이의 결합을 줄여 테스트 가능성을 높입니다.
 
 <details>
 <summary><code>ScopeComparisonService.java</code> 전체 코드</summary>
@@ -381,10 +387,11 @@ public class ScopeComparisonService {
 ### 4.8 `ScopeComparisonServiceTest.java`
 
 - 파일 경로: `src/test/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task07_singleton_prototype_scope/ScopeComparisonServiceTest.java`
-- 역할: 핵심 동작을 자동 검증하는 테스트 코드
+- 역할: 요구사항 검증 테스트
 - 상세 설명:
-- 요구사항을 테스트 시나리오로 고정해 회귀를 빠르게 감지합니다.
-- 핵심 분기(정상/예외)를 검증해 구현 의도를 보장합니다.
+- 검증 시나리오: `compare_verifiesSingletonAndPrototypeBehavior,`
+- 정상/예외 흐름을 코드 수준에서 고정해 회귀를 빠르게 감지합니다.
+- 요구사항이 바뀌면 테스트부터 수정해 변경 범위를 명확히 확인합니다.
 
 <details>
 <summary><code>ScopeComparisonServiceTest.java</code> 전체 코드</summary>
@@ -432,38 +439,45 @@ class ScopeComparisonServiceTest {
 
 ## 5. 새로 나온 개념 정리 + 참고 링크
 
-- **빈 스코프**: 싱글톤/프로토타입에 따라 생성과 재사용 시점이 달라집니다.  
-  공식 문서: https://docs.spring.io/spring-framework/reference/core/beans/factory-scopes.html
-- **`ObjectProvider` 지연 조회**: 필요 시점마다 새로운 프로토타입 빈을 조회할 수 있습니다.  
-  공식 문서: https://docs.spring.io/spring-framework/reference/core/beans/dependencies/factory-method-injection.html
+- **빈 스코프(Singleton/Prototype)**
+  - 핵심: 생성/재사용 시점이 스코프에 따라 달라집니다.
+  - 참고: https://docs.spring.io/spring-framework/reference/core/beans/factory-scopes.html
+- **`ObjectProvider` 지연 조회**
+  - 핵심: 필요한 순간마다 새 프로토타입 빈을 조회할 수 있습니다.
+  - 참고: https://docs.spring.io/spring-framework/reference/core/beans/dependencies/factory-method-injection.html
 
-## 6. 실행·빌드·테스트 방법
+## 6. 실행·검증 방법
 
-애플리케이션 실행:
+### 6.1 실행
 
 ```bash
 ./gradlew bootRun
 ```
 
-테스트 실행(태스크 범위):
+### 6.2 API 호출 예시
+
+```bash
+curl http://localhost:8080/mission02/task07/scopes
+curl http://localhost:8080/mission02/task07/scopes
+```
+
+확인 포인트:
+- `singletonScope.sameInstance = true`
+- `prototypeInjectedIntoSingleton.sameInstance = true`
+- `prototypeFromProvider.sameInstance = false`
+
+### 6.3 테스트
 
 ```bash
 ./gradlew test --tests "*task07_singleton_prototype_scope*"
 ```
 
-예상 결과:
-- 태스크 관련 테스트가 모두 통과해야 합니다.
-- 실패 시 문서의 파일별 코드 블록과 테스트 코드를 함께 확인합니다.
-
 ## 7. 결과 확인 방법
 
-- 컨트롤러가 있는 태스크는 API 호출(curl/브라우저)로 응답 구조와 상태 코드를 확인합니다.
-- SQL 로그/애스펙트 로그/콘솔 출력이 필요한 태스크는 실행 로그를 함께 확인합니다.
-- 현재 태스크 디렉토리의 스크린샷 파일:
-  - `scope-run-result.png`
+- `/mission02/task07/scopes`를 2회 호출해 스코프별 인스턴스 재사용 차이를 비교합니다.
+- 현재 문서 디렉토리의 스크린샷(`scope-run-result.png`)과 응답 값을 대조해 확인합니다.
 
 ## 8. 학습 내용
 
-- 파일 경로 인덱스를 먼저 확인하면 전체 구조를 빠르게 파악할 수 있습니다.
-- 컨트롤러-서비스-저장소(또는 정책/도메인) 흐름을 분리하면 변경 지점을 명확히 관리할 수 있습니다.
-- 공식 문서를 기준으로 개념을 확인하면서 코드와 연결하면 실습 재현성이 높아집니다.
+- 스코프 차이는 개념 설명보다 인스턴스 ID/카운터를 직접 비교할 때 가장 명확하게 이해됩니다.
+- 프로토타입을 싱글톤에 직접 주입하면 기대와 달리 재사용될 수 있으므로 조회 전략을 함께 고려해야 합니다.

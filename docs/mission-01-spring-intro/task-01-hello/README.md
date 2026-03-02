@@ -1,36 +1,38 @@
 # Spring Boot "Hello, World!" API 설정
 
-이 문서는 `mission-01-spring-intro`의 `task-01-hello` 구현을 동일 포맷으로 정리한 보고서입니다.
-파일 경로 인덱스, 파일별 상세 설명, 핵심 개념 링크, 전체 코드 토글을 함께 제공합니다.
+이 문서는 `mission-01-spring-intro`의 `task-01-hello`를 수작업 기준으로 다시 정리한 보고서입니다.
+태스크별 의도와 코드 흐름을 중심으로 설명하고, 모든 관련 파일은 토글 코드 블록으로 확인할 수 있습니다.
 
 ## 1. 작업 개요
 
 - 미션/태스크: `mission-01-spring-intro` / `task-01-hello`
-- 소스 패키지: `com.goorm.springmissionsplayground.mission01_spring_intro.task01_hello`
-- 코드 파일 수(테스트 포함): **1개**
+- 목표:
+  - 스프링 부트 애플리케이션에서 가장 단순한 REST 엔드포인트를 노출한다.
+  - 컨트롤러 매핑과 문자열 응답 직렬화가 어떻게 동작하는지 확인한다.
+- 엔드포인트: `GET /hello`
 
 ## 2. 코드 파일 경로 인덱스
 
-| 파일 경로 | 역할 |
-|---|---|
-| `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task01_hello/HelloWorldController.java` | HTTP 요청을 받아 문자열 응답을 반환하는 REST 컨트롤러 |
+| 구분 | 파일 경로 | 역할 |
+|---|---|---|
+| Etc | `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task01_hello/HelloWorldController.java` | 요청 진입점(HTTP 매핑/응답 구성) |
 
-## 3. 구현 흐름 요약
+## 3. 구현 단계와 주요 코드 해설
 
-1. 컨트롤러(있다면)에서 요청을 수신하고 입력을 DTO/파라미터로 변환합니다.
-2. 서비스 계층에서 핵심 규칙(검증, 계산, 트랜잭션, 정책 선택)을 수행합니다.
-3. 저장소/도메인 계층과 협력해 상태를 조회·변경하고 결과를 응답으로 반환합니다.
-4. 테스트 코드에서 정상/예외 흐름을 검증해 동작을 고정합니다.
+1. `HelloWorldController`를 `@RestController`로 선언해 JSON/문자열 응답 가능한 컨트롤러 빈으로 등록합니다.
+2. `@GetMapping("/hello")`로 URI를 매핑해 DispatcherServlet → HandlerMapping → Controller 흐름을 확인합니다.
+3. 메서드 반환값("Hello, World!")이 HTTP 응답 본문으로 직렬화되는 최소 경로를 검증합니다.
 
 ## 4. 파일별 상세 설명 + 전체 코드
 
 ### 4.1 `HelloWorldController.java`
 
 - 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task01_hello/HelloWorldController.java`
-- 역할: HTTP 요청을 받아 문자열 응답을 반환하는 REST 컨트롤러
+- 역할: 요청 진입점(HTTP 매핑/응답 구성)
 - 상세 설명:
-- `GET /hello` 요청을 `helloWorld()` 메서드에 매핑해 기본 엔드포인트를 노출합니다.
-- 스프링 MVC의 요청 처리 흐름(컨트롤러 매핑, 응답 직렬화) 학습용 최소 예제를 제공합니다.
+- 기본 경로: `/hello`
+- 매핑 메서드: Get
+- 컨트롤러는 입력을 바인딩하고 서비스 결과를 HTTP 응답 규약에 맞춰 반환합니다.
 
 <details>
 <summary><code>HelloWorldController.java</code> 전체 코드</summary>
@@ -55,30 +57,35 @@ public class HelloWorldController {
 
 ## 5. 새로 나온 개념 정리 + 참고 링크
 
-- **`@RestController`와 요청 매핑**: 컨트롤러 메서드를 HTTP 엔드포인트로 노출합니다.  
-  공식 문서: https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller.html
-- **Spring Boot 자동 구성(Auto Configuration)**: 웹 서버/DispatcherServlet을 기본 설정으로 자동 구성합니다.  
-  공식 문서: https://docs.spring.io/spring-boot/reference/using/auto-configuration.html
+- **`@RestController`**
+  - 핵심: 컨트롤러 반환값을 HTTP 응답 본문으로 바로 직렬화합니다.
+  - 참고: https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-methods/responsebody.html
+- **`@GetMapping`**
+  - 핵심: 특정 URI를 GET 메서드와 매핑합니다.
+  - 참고: https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-requestmapping.html
 
-## 6. 실행·빌드·테스트 방법
+## 6. 실행·검증 방법
 
-애플리케이션 실행:
+### 6.1 실행
 
 ```bash
 ./gradlew bootRun
 ```
 
-테스트 실행(참고):
-- 현재 태스크 전용 테스트 파일은 없습니다. 필요하면 추후 테스트를 추가합니다.
+### 6.2 호출 예시
+
+```bash
+curl http://localhost:8080/hello
+```
+
+예상 결과: `Hello, World!`
 
 ## 7. 결과 확인 방법
 
-- 컨트롤러가 있는 태스크는 API 호출(curl/브라우저)로 응답 구조와 상태 코드를 확인합니다.
-- SQL 로그/애스펙트 로그/콘솔 출력이 필요한 태스크는 실행 로그를 함께 확인합니다.
-- 필요 시 실행 결과를 캡처해 태스크 문서 디렉토리에 PNG로 저장합니다.
+- 브라우저 또는 curl로 `/hello`를 호출해 문자열 응답을 확인합니다.
+- 초기 실습 캡처가 필요하면 `docs/mission-01-spring-intro/task-01-hello/`에 PNG를 저장합니다.
 
 ## 8. 학습 내용
 
-- 파일 경로 인덱스를 먼저 확인하면 전체 구조를 빠르게 파악할 수 있습니다.
-- 컨트롤러-서비스-저장소(또는 정책/도메인) 흐름을 분리하면 변경 지점을 명확히 관리할 수 있습니다.
-- 공식 문서를 기준으로 개념을 확인하면서 코드와 연결하면 실습 재현성이 높아집니다.
+- 가장 작은 엔드포인트를 직접 구성하면 스프링 웹 요청 처리 파이프라인을 빠르게 이해할 수 있습니다.
+- 이후 태스크에서 계층이 늘어나더라도 컨트롤러 매핑과 응답 반환 원리는 동일하게 유지됩니다.

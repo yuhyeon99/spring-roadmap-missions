@@ -1,43 +1,45 @@
 # 스프링 핵심 원리 - 기본: AOP를 사용하여 애스펙트 구현하기
 
-이 문서는 `mission-02-spring-core-basic`의 `task-09-aop-aspect` 구현을 동일 포맷으로 정리한 보고서입니다.
-파일 경로 인덱스, 파일별 상세 설명, 핵심 개념 링크, 전체 코드 토글을 함께 제공합니다.
+이 문서는 `mission-02-spring-core-basic`의 `task-09-aop-aspect`를 수작업 기준으로 다시 정리한 보고서입니다.
+태스크별 의도와 코드 흐름을 중심으로 설명하고, 모든 관련 파일은 토글 코드 블록으로 확인할 수 있습니다.
 
 ## 1. 작업 개요
 
 - 미션/태스크: `mission-02-spring-core-basic` / `task-09-aop-aspect`
-- 소스 패키지: `com.goorm.springmissionsplayground.mission02_spring_core_basic.task09_aop_aspect`
-- 코드 파일 수(테스트 포함): **6개**
-- 주요 API 베이스 경로:
-  - `/mission02/task09/aspect` (AspectDemoController.java)
+- 목표:
+  - 커스텀 애너테이션(`@TrackExecution`) 기반 포인트컷으로 애스펙트 적용 범위를 제한한다.
+  - `@Around` 어드바이스에서 실행 시간을 측정하고 로그를 남긴다.
+  - 테스트에서 AOP 프록시 생성과 애너테이션 대상 메서드 로깅 여부를 검증한다.
+- 엔드포인트: `GET /mission02/task09/aspect/demo?topic=...`
 
 ## 2. 코드 파일 경로 인덱스
 
-| 파일 경로 | 역할 |
-|---|---|
-| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/annotation/TrackExecution.java` | 커스텀 애너테이션 정의 |
-| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/aspect/ExecutionLoggingAspect.java` | 공통 관심사(AOP) 로직 분리 |
-| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/controller/AspectDemoController.java` | HTTP 요청을 받아 입력을 바인딩하고 서비스 결과를 응답으로 반환 |
-| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/dto/AspectDemoResponse.java` | 계층 간 데이터 전달 형식(요청/응답) |
-| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/service/AspectDemoService.java` | 핵심 비즈니스 로직과 흐름 제어를 담당 |
-| `src/test/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/ExecutionLoggingAspectTest.java` | 핵심 동작을 자동 검증하는 테스트 코드 |
+| 구분 | 파일 경로 | 역할 |
+|---|---|---|
+| Annotation | `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/annotation/TrackExecution.java` | 커스텀 애너테이션 선언 |
+| Aspect | `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/aspect/ExecutionLoggingAspect.java` | 공통 관심사(AOP) 분리 |
+| Controller | `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/controller/AspectDemoController.java` | 요청 진입점(HTTP 매핑/응답 구성) |
+| DTO | `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/dto/AspectDemoResponse.java` | 요청/응답 데이터 구조 |
+| Service | `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/service/AspectDemoService.java` | 비즈니스 로직과 흐름 제어 |
+| Test | `src/test/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/ExecutionLoggingAspectTest.java` | 요구사항 검증 테스트 |
 
-## 3. 구현 흐름 요약
+## 3. 구현 단계와 주요 코드 해설
 
-1. 컨트롤러(있다면)에서 요청을 수신하고 입력을 DTO/파라미터로 변환합니다.
-2. 서비스 계층에서 핵심 규칙(검증, 계산, 트랜잭션, 정책 선택)을 수행합니다.
-3. 저장소/도메인 계층과 협력해 상태를 조회·변경하고 결과를 응답으로 반환합니다.
-4. 테스트 코드에서 정상/예외 흐름을 검증해 동작을 고정합니다.
+1. `@TrackExecution`을 정의해 애스펙트 적용 대상을 명시적으로 표시합니다.
+2. `ExecutionLoggingAspect`는 `@Around("@annotation(trackExecution)")`로 대상 메서드 실행 전후 시간을 측정합니다.
+3. `AspectDemoService#buildSummary()`에 애너테이션을 부여해 실제 적용 지점을 만들고, `ping()`은 비교군으로 둡니다.
+4. 테스트는 AOP 프록시 생성 여부와 애너테이션 대상만 로그가 남는지 동시에 검증합니다.
 
 ## 4. 파일별 상세 설명 + 전체 코드
 
 ### 4.1 `TrackExecution.java`
 
 - 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/annotation/TrackExecution.java`
-- 역할: 커스텀 애너테이션 정의
+- 역할: 커스텀 애너테이션 선언
 - 상세 설명:
-- 애스펙트 적용 대상처럼 의미 있는 표식을 애너테이션으로 명시합니다.
-- 선언적 방식으로 코드 가독성과 재사용성을 높입니다.
+- 선언적 표식을 코드에 남겨 적용 대상을 명확히 지정합니다.
+- 런타임 유지(RUNTIME) 설정으로 AOP/리플렉션에서 인식되도록 구성합니다.
+- 규칙을 애너테이션으로 통일하면 호출부 가독성이 좋아집니다.
 
 <details>
 <summary><code>TrackExecution.java</code> 전체 코드</summary>
@@ -61,10 +63,11 @@ public @interface TrackExecution {
 ### 4.2 `ExecutionLoggingAspect.java`
 
 - 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/aspect/ExecutionLoggingAspect.java`
-- 역할: 공통 관심사(AOP) 로직 분리
+- 역할: 공통 관심사(AOP) 분리
 - 상세 설명:
-- 로깅/성능 측정처럼 공통 관심사를 비즈니스 코드와 분리합니다.
-- 포인트컷과 어드바이스로 적용 범위를 명확히 제어합니다.
+- 로깅/측정 같은 공통 관심사를 비즈니스 로직과 분리합니다.
+- 포인트컷으로 적용 범위를 선언하고, 어드바이스에서 전후 동작을 정의합니다.
+- 애스펙트 적용 여부는 프록시 기반으로 테스트에서 검증할 수 있습니다.
 
 <details>
 <summary><code>ExecutionLoggingAspect.java</code> 전체 코드</summary>
@@ -104,11 +107,11 @@ public class ExecutionLoggingAspect {
 ### 4.3 `AspectDemoController.java`
 
 - 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/controller/AspectDemoController.java`
-- 역할: HTTP 요청을 받아 입력을 바인딩하고 서비스 결과를 응답으로 반환
+- 역할: 요청 진입점(HTTP 매핑/응답 구성)
 - 상세 설명:
-- 요청 URI와 HTTP 메서드를 메서드에 매핑해 외부 진입점을 구성합니다.
-- 요청 DTO/파라미터를 검증 가능한 형태로 서비스 계층에 전달합니다.
-- 응답 상태 코드와 응답 DTO를 통해 API 계약을 고정합니다.
+- 기본 경로: `/mission02/task09/aspect`
+- 매핑 메서드: Get /demo;
+- 컨트롤러는 입력을 바인딩하고 서비스 결과를 HTTP 응답 규약에 맞춰 반환합니다.
 
 <details>
 <summary><code>AspectDemoController.java</code> 전체 코드</summary>
@@ -146,10 +149,11 @@ public class AspectDemoController {
 ### 4.4 `AspectDemoResponse.java`
 
 - 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/dto/AspectDemoResponse.java`
-- 역할: 계층 간 데이터 전달 형식(요청/응답)
+- 역할: 요청/응답 데이터 구조
 - 상세 설명:
-- 요청/응답 전용 구조를 분리해 도메인 모델의 직접 노출을 방지합니다.
-- API 스펙 변경이 도메인 내부 구조에 전파되지 않도록 완충 계층 역할을 합니다.
+- 요청/응답 전용 타입을 분리해 API 계약을 안정적으로 유지합니다.
+- 도메인 객체 직접 노출을 피해서 내부 구조 변경 전파를 줄입니다.
+- 컨트롤러와 서비스 사이의 데이터 경계를 명확히 만듭니다.
 
 <details>
 <summary><code>AspectDemoResponse.java</code> 전체 코드</summary>
@@ -182,11 +186,11 @@ public class AspectDemoResponse {
 ### 4.5 `AspectDemoService.java`
 
 - 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/service/AspectDemoService.java`
-- 역할: 핵심 비즈니스 로직과 흐름 제어를 담당
+- 역할: 비즈니스 로직과 흐름 제어
 - 상세 설명:
-- 비즈니스 규칙을 한 곳에 모아 컨트롤러와 저장소 책임을 분리합니다.
-- 트랜잭션 경계, 예외 처리, 정책 선택 같은 핵심 흐름을 제어합니다.
-- 테스트 시 서비스 단위로 핵심 동작을 검증하기 쉬운 구조를 제공합니다.
+- 핵심 공개 메서드: `public class AspectDemoService {,    public String buildSummary(String topic) {,    public String ping() {,`
+- 서비스 계층에서 검증, 계산, 상태 변경, 예외 처리를 집중 관리합니다.
+- 컨트롤러/저장소 사이의 결합을 줄여 테스트 가능성을 높입니다.
 
 <details>
 <summary><code>AspectDemoService.java</code> 전체 코드</summary>
@@ -226,10 +230,11 @@ public class AspectDemoService {
 ### 4.6 `ExecutionLoggingAspectTest.java`
 
 - 파일 경로: `src/test/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task09_aop_aspect/ExecutionLoggingAspectTest.java`
-- 역할: 핵심 동작을 자동 검증하는 테스트 코드
+- 역할: 요구사항 검증 테스트
 - 상세 설명:
-- 요구사항을 테스트 시나리오로 고정해 회귀를 빠르게 감지합니다.
-- 핵심 분기(정상/예외)를 검증해 구현 의도를 보장합니다.
+- 검증 시나리오: `trackedService_isProxiedBySpringAop,aspect_logsOnlyWhenTrackExecutionAnnotationExists,`
+- 정상/예외 흐름을 코드 수준에서 고정해 회귀를 빠르게 감지합니다.
+- 요구사항이 바뀌면 테스트부터 수정해 변경 범위를 명확히 확인합니다.
 
 <details>
 <summary><code>ExecutionLoggingAspectTest.java</code> 전체 코드</summary>
@@ -294,37 +299,44 @@ class ExecutionLoggingAspectTest {
 
 ## 5. 새로 나온 개념 정리 + 참고 링크
 
-- **`@Aspect`와 `@Around`**: 메서드 실행 전후 공통 로직을 캡슐화합니다.  
-  공식 문서: https://docs.spring.io/spring-framework/reference/core/aop/ataspectj/advice.html
-- **애너테이션 기반 포인트컷**: 커스텀 애너테이션으로 적용 대상을 명확히 제한합니다.  
-  공식 문서: https://docs.spring.io/spring-framework/reference/core/aop/ataspectj/pointcuts.html
+- **`@Aspect` / `@Around`**
+  - 핵심: 메서드 전후 공통 로직(로깅/측정)을 선언적으로 적용합니다.
+  - 참고: https://docs.spring.io/spring-framework/reference/core/aop/ataspectj/advice.html
+- **애너테이션 기반 포인트컷**
+  - 핵심: 커스텀 애너테이션으로 적용 대상을 안전하게 제한합니다.
+  - 참고: https://docs.spring.io/spring-framework/reference/core/aop/ataspectj/pointcuts.html
 
-## 6. 실행·빌드·테스트 방법
+## 6. 실행·검증 방법
 
-애플리케이션 실행:
+### 6.1 실행
 
 ```bash
 ./gradlew bootRun
 ```
 
-테스트 실행(태스크 범위):
+### 6.2 API 호출 예시
+
+```bash
+curl "http://localhost:8080/mission02/task09/aspect/demo?topic=AOP"
+```
+
+확인 포인트:
+- 응답 본문 정상 반환
+- 콘솔에 `[TASK09-AOP]` 실행 시간 로그 출력
+
+### 6.3 테스트
 
 ```bash
 ./gradlew test --tests "*task09_aop_aspect*"
 ```
 
-예상 결과:
-- 태스크 관련 테스트가 모두 통과해야 합니다.
-- 실패 시 문서의 파일별 코드 블록과 테스트 코드를 함께 확인합니다.
-
 ## 7. 결과 확인 방법
 
-- 컨트롤러가 있는 태스크는 API 호출(curl/브라우저)로 응답 구조와 상태 코드를 확인합니다.
-- SQL 로그/애스펙트 로그/콘솔 출력이 필요한 태스크는 실행 로그를 함께 확인합니다.
-- 필요 시 실행 결과를 캡처해 태스크 문서 디렉토리에 PNG로 저장합니다.
+- 문서의 호출 예시를 그대로 실행해 상태 코드/응답 본문을 확인합니다.
+- 테스트 명령으로 자동 검증 통과 여부를 함께 확인합니다.
+- 제출이 필요한 경우 실행 결과를 태스크 문서 디렉토리에 PNG로 저장합니다.
 
 ## 8. 학습 내용
 
-- 파일 경로 인덱스를 먼저 확인하면 전체 구조를 빠르게 파악할 수 있습니다.
-- 컨트롤러-서비스-저장소(또는 정책/도메인) 흐름을 분리하면 변경 지점을 명확히 관리할 수 있습니다.
-- 공식 문서를 기준으로 개념을 확인하면서 코드와 연결하면 실습 재현성이 높아집니다.
+- 애너테이션 포인트컷은 적용 범위를 코드에서 명확히 드러내 유지보수성을 높입니다.
+- 프록시 생성 여부까지 테스트하면 “동작한다”를 넘어 “왜 동작하는지”를 검증할 수 있습니다.
