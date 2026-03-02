@@ -1,93 +1,396 @@
 # 스프링 핵심 원리 - 기본: 애너테이션을 사용하여 빈 주입하기
 
-이 문서는 `mission-02-spring-core-basic`의 `task-01-annotation-injection` 작업 내용을 정리한 보고서입니다.  
-스프링에서 `@Autowired`, `@Inject`, `@Qualifier`를 사용해 빈 의존성을 주입하고, 실제 요청 흐름에서 주입된 빈이 정상 동작하는지 확인했습니다.
+이 문서는 `mission-02-spring-core-basic`의 `task-01-annotation-injection` 구현을 동일 포맷으로 정리한 보고서입니다.
+파일 경로 인덱스, 파일별 상세 설명, 핵심 개념 링크, 전체 코드 토글을 함께 제공합니다.
 
 ## 1. 작업 개요
 
-- 패키지: `com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection`
-- 목표:
-  - 애너테이션 기반으로 빈을 등록하고 주입한다.
-  - 동일 인터페이스 구현체가 여러 개인 상황에서 주입 대상을 명확히 지정한다.
-  - 주입된 빈이 API 호출 시 올바르게 동작하는지 검증한다.
-- 시나리오: 이름 입력값을 정리한 뒤(`@Inject`), 선택된 인사 정책 빈으로 메시지를 생성(`@Autowired` + `@Qualifier`)하여 응답한다.
+- 미션/태스크: `mission-02-spring-core-basic` / `task-01-annotation-injection`
+- 소스 패키지: `com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection`
+- 코드 파일 수(테스트 포함): **9개**
+- 주요 API 베이스 경로:
+  - `/mission02/task01/greetings` (GreetingController.java)
 
-## 2. 구현 단계와 주요 코드
+## 2. 코드 파일 경로 인덱스
 
-### 2.1 정책 빈 등록(`@Component`)
+| 파일 경로 | 역할 |
+|---|---|
+| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/controller/GreetingController.java` | HTTP 요청을 받아 입력을 바인딩하고 서비스 결과를 응답으로 반환 |
+| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/dto/GreetingResponse.java` | 계층 간 데이터 전달 형식(요청/응답) |
+| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/policy/FormalGreetingPolicy.java` | 전략(인터페이스/구현) 분리로 확장성을 제공 |
+| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/policy/FriendlyGreetingPolicy.java` | 전략(인터페이스/구현) 분리로 확장성을 제공 |
+| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/policy/GreetingPolicy.java` | 전략(인터페이스/구현) 분리로 확장성을 제공 |
+| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/service/AnnotationGreetingService.java` | 핵심 비즈니스 로직과 흐름 제어를 담당 |
+| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/service/NameNormalizer.java` | 핵심 비즈니스 로직과 흐름 제어를 담당 |
+| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/service/NameSanitizer.java` | 핵심 비즈니스 로직과 흐름 제어를 담당 |
+| `src/test/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/AnnotationGreetingServiceTest.java` | 핵심 동작을 자동 검증하는 테스트 코드 |
 
-- `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/policy/GreetingPolicy.java`
-- `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/policy/FormalGreetingPolicy.java`
-- `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/policy/FriendlyGreetingPolicy.java`
+## 3. 구현 흐름 요약
 
-`GreetingPolicy` 인터페이스를 만들고, 구현체 2개를 `@Component`로 등록했습니다.  
-주입 시 식별이 가능하도록 빈 이름을 `formalGreetingPolicy`, `friendlyGreetingPolicy`로 지정했습니다.
+1. 컨트롤러(있다면)에서 요청을 수신하고 입력을 DTO/파라미터로 변환합니다.
+2. 서비스 계층에서 핵심 규칙(검증, 계산, 트랜잭션, 정책 선택)을 수행합니다.
+3. 저장소/도메인 계층과 협력해 상태를 조회·변경하고 결과를 응답으로 반환합니다.
+4. 테스트 코드에서 정상/예외 흐름을 검증해 동작을 고정합니다.
 
-### 2.2 `@Inject`로 보조 컴포넌트 주입
+## 4. 파일별 상세 설명 + 전체 코드
 
-- `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/service/NameSanitizer.java`
-- `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/service/NameNormalizer.java`
+### 4.1 `GreetingController.java`
 
-`NameNormalizer`는 생성자에 `@Inject`를 사용해 `NameSanitizer` 빈을 주입받습니다.  
-입력 이름의 앞뒤 공백 제거, 다중 공백 정규화, 빈 문자열 기본값(`손님`) 처리를 담당합니다.
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/controller/GreetingController.java`
+- 역할: HTTP 요청을 받아 입력을 바인딩하고 서비스 결과를 응답으로 반환
+- 상세 설명:
+- 요청 URI와 HTTP 메서드를 메서드에 매핑해 외부 진입점을 구성합니다.
+- 요청 DTO/파라미터를 검증 가능한 형태로 서비스 계층에 전달합니다.
+- 응답 상태 코드와 응답 DTO를 통해 API 계약을 고정합니다.
 
-### 2.3 `@Autowired` + `@Qualifier`로 정책 선택 주입
+<details>
+<summary><code>GreetingController.java</code> 전체 코드</summary>
 
-- `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/service/AnnotationGreetingService.java`
-- `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/dto/GreetingResponse.java`
+```java
+package com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection.controller;
 
-`AnnotationGreetingService` 생성자에 `@Autowired`를 적용하고,  
-`GreetingPolicy` 타입 주입 파라미터에 `@Qualifier("formalGreetingPolicy")`를 지정해 원하는 구현체를 선택했습니다.
+import com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection.dto.GreetingResponse;
+import com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection.service.AnnotationGreetingService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-### 2.4 API 엔드포인트 연결
+@RestController
+@RequestMapping("/mission02/task01/greetings")
+public class GreetingController {
 
-- `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/controller/GreetingController.java`
+    private final AnnotationGreetingService greetingService;
 
-`GET /mission02/task01/greetings?name=...` 요청으로 서비스 결과를 반환하도록 구성했습니다.
+    public GreetingController(AnnotationGreetingService greetingService) {
+        this.greetingService = greetingService;
+    }
 
-## 3. 실행·빌드·테스트 방법과 예상 결과
+    @GetMapping
+    public GreetingResponse greet(@RequestParam(required = false) String name) {
+        return greetingService.greet(name);
+    }
+}
+```
 
-### 3.1 애플리케이션 실행
+</details>
+
+### 4.2 `GreetingResponse.java`
+
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/dto/GreetingResponse.java`
+- 역할: 계층 간 데이터 전달 형식(요청/응답)
+- 상세 설명:
+- 요청/응답 전용 구조를 분리해 도메인 모델의 직접 노출을 방지합니다.
+- API 스펙 변경이 도메인 내부 구조에 전파되지 않도록 완충 계층 역할을 합니다.
+
+<details>
+<summary><code>GreetingResponse.java</code> 전체 코드</summary>
+
+```java
+package com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection.dto;
+
+public class GreetingResponse {
+
+    private final String message;
+    private final String selectedPolicy;
+    private final String injectionType;
+
+    public GreetingResponse(String message, String selectedPolicy, String injectionType) {
+        this.message = message;
+        this.selectedPolicy = selectedPolicy;
+        this.injectionType = injectionType;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getSelectedPolicy() {
+        return selectedPolicy;
+    }
+
+    public String getInjectionType() {
+        return injectionType;
+    }
+}
+```
+
+</details>
+
+### 4.3 `FormalGreetingPolicy.java`
+
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/policy/FormalGreetingPolicy.java`
+- 역할: 전략(인터페이스/구현) 분리로 확장성을 제공
+- 상세 설명:
+- 공통 인터페이스와 구현체를 분리해 전략 패턴을 적용합니다.
+- 새로운 정책 추가 시 기존 코드 변경을 최소화할 수 있습니다.
+
+<details>
+<summary><code>FormalGreetingPolicy.java</code> 전체 코드</summary>
+
+```java
+package com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection.policy;
+
+import org.springframework.stereotype.Component;
+
+@Component("formalGreetingPolicy")
+public class FormalGreetingPolicy implements GreetingPolicy {
+
+    @Override
+    public String createMessage(String name) {
+        return "안녕하세요, " + name + "님. 애너테이션 기반 빈 주입이 정상 동작했습니다.";
+    }
+}
+```
+
+</details>
+
+### 4.4 `FriendlyGreetingPolicy.java`
+
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/policy/FriendlyGreetingPolicy.java`
+- 역할: 전략(인터페이스/구현) 분리로 확장성을 제공
+- 상세 설명:
+- 공통 인터페이스와 구현체를 분리해 전략 패턴을 적용합니다.
+- 새로운 정책 추가 시 기존 코드 변경을 최소화할 수 있습니다.
+
+<details>
+<summary><code>FriendlyGreetingPolicy.java</code> 전체 코드</summary>
+
+```java
+package com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection.policy;
+
+import org.springframework.stereotype.Component;
+
+@Component("friendlyGreetingPolicy")
+public class FriendlyGreetingPolicy implements GreetingPolicy {
+
+    @Override
+    public String createMessage(String name) {
+        return "반가워요, " + name + "님! 오늘도 즐겁게 스프링을 학습해봐요.";
+    }
+}
+```
+
+</details>
+
+### 4.5 `GreetingPolicy.java`
+
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/policy/GreetingPolicy.java`
+- 역할: 전략(인터페이스/구현) 분리로 확장성을 제공
+- 상세 설명:
+- 공통 인터페이스와 구현체를 분리해 전략 패턴을 적용합니다.
+- 새로운 정책 추가 시 기존 코드 변경을 최소화할 수 있습니다.
+
+<details>
+<summary><code>GreetingPolicy.java</code> 전체 코드</summary>
+
+```java
+package com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection.policy;
+
+public interface GreetingPolicy {
+
+    String createMessage(String name);
+}
+```
+
+</details>
+
+### 4.6 `AnnotationGreetingService.java`
+
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/service/AnnotationGreetingService.java`
+- 역할: 핵심 비즈니스 로직과 흐름 제어를 담당
+- 상세 설명:
+- 비즈니스 규칙을 한 곳에 모아 컨트롤러와 저장소 책임을 분리합니다.
+- 트랜잭션 경계, 예외 처리, 정책 선택 같은 핵심 흐름을 제어합니다.
+- 테스트 시 서비스 단위로 핵심 동작을 검증하기 쉬운 구조를 제공합니다.
+
+<details>
+<summary><code>AnnotationGreetingService.java</code> 전체 코드</summary>
+
+```java
+package com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection.service;
+
+import com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection.dto.GreetingResponse;
+import com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection.policy.GreetingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+@Service
+public class AnnotationGreetingService {
+
+    private final GreetingPolicy greetingPolicy;
+    private final NameNormalizer nameNormalizer;
+
+    @Autowired
+    public AnnotationGreetingService(
+            @Qualifier("formalGreetingPolicy") GreetingPolicy greetingPolicy,
+            NameNormalizer nameNormalizer
+    ) {
+        this.greetingPolicy = greetingPolicy;
+        this.nameNormalizer = nameNormalizer;
+    }
+
+    public GreetingResponse greet(String rawName) {
+        String normalizedName = nameNormalizer.normalize(rawName);
+        String message = greetingPolicy.createMessage(normalizedName);
+        return new GreetingResponse(message, "formalGreetingPolicy", "@Autowired + @Inject");
+    }
+}
+```
+
+</details>
+
+### 4.7 `NameNormalizer.java`
+
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/service/NameNormalizer.java`
+- 역할: 핵심 비즈니스 로직과 흐름 제어를 담당
+- 상세 설명:
+- 비즈니스 규칙을 한 곳에 모아 컨트롤러와 저장소 책임을 분리합니다.
+- 트랜잭션 경계, 예외 처리, 정책 선택 같은 핵심 흐름을 제어합니다.
+- 테스트 시 서비스 단위로 핵심 동작을 검증하기 쉬운 구조를 제공합니다.
+
+<details>
+<summary><code>NameNormalizer.java</code> 전체 코드</summary>
+
+```java
+package com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection.service;
+
+import jakarta.inject.Inject;
+import org.springframework.stereotype.Component;
+
+@Component
+public class NameNormalizer {
+
+    private final NameSanitizer nameSanitizer;
+
+    @Inject
+    public NameNormalizer(NameSanitizer nameSanitizer) {
+        this.nameSanitizer = nameSanitizer;
+    }
+
+    public String normalize(String rawName) {
+        return nameSanitizer.sanitize(rawName);
+    }
+}
+```
+
+</details>
+
+### 4.8 `NameSanitizer.java`
+
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/service/NameSanitizer.java`
+- 역할: 핵심 비즈니스 로직과 흐름 제어를 담당
+- 상세 설명:
+- 비즈니스 규칙을 한 곳에 모아 컨트롤러와 저장소 책임을 분리합니다.
+- 트랜잭션 경계, 예외 처리, 정책 선택 같은 핵심 흐름을 제어합니다.
+- 테스트 시 서비스 단위로 핵심 동작을 검증하기 쉬운 구조를 제공합니다.
+
+<details>
+<summary><code>NameSanitizer.java</code> 전체 코드</summary>
+
+```java
+package com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection.service;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class NameSanitizer {
+
+    public String sanitize(String rawName) {
+        if (rawName == null) {
+            return "손님";
+        }
+
+        String normalized = rawName.trim().replaceAll("\\s+", " ");
+        return normalized.isBlank() ? "손님" : normalized;
+    }
+}
+```
+
+</details>
+
+### 4.9 `AnnotationGreetingServiceTest.java`
+
+- 파일 경로: `src/test/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task01_annotation_injection/AnnotationGreetingServiceTest.java`
+- 역할: 핵심 동작을 자동 검증하는 테스트 코드
+- 상세 설명:
+- 요구사항을 테스트 시나리오로 고정해 회귀를 빠르게 감지합니다.
+- 핵심 분기(정상/예외)를 검증해 구현 의도를 보장합니다.
+
+<details>
+<summary><code>AnnotationGreetingServiceTest.java</code> 전체 코드</summary>
+
+```java
+package com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection;
+
+import com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection.dto.GreetingResponse;
+import com.goorm.springmissionsplayground.mission02_spring_core_basic.task01_annotation_injection.service.AnnotationGreetingService;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest
+class AnnotationGreetingServiceTest {
+
+    @Autowired
+    private AnnotationGreetingService greetingService;
+
+    @Test
+    void greet_usesAutowiredAndInjectInjectedBeans() {
+        GreetingResponse response = greetingService.greet("  스프링   학습자  ");
+
+        assertThat(response.getMessage()).isEqualTo("안녕하세요, 스프링 학습자님. 애너테이션 기반 빈 주입이 정상 동작했습니다.");
+        assertThat(response.getSelectedPolicy()).isEqualTo("formalGreetingPolicy");
+        assertThat(response.getInjectionType()).isEqualTo("@Autowired + @Inject");
+    }
+
+    @Test
+    void greet_usesFallbackNameWhenInputIsBlank() {
+        GreetingResponse response = greetingService.greet("   ");
+
+        assertThat(response.getMessage()).contains("손님");
+    }
+}
+```
+
+</details>
+
+## 5. 새로 나온 개념 정리 + 참고 링크
+
+- **애너테이션 기반 빈 주입**: `@Component`, `@Service`로 빈 등록 후 생성자 주입을 사용합니다.  
+  공식 문서: https://docs.spring.io/spring-framework/reference/core/beans/annotation-config.html
+- **빈 후보 선택 규칙**: 동일 타입 빈이 여러 개면 이름/한정자로 구분합니다.  
+  공식 문서: https://docs.spring.io/spring-framework/reference/core/beans/annotation-config/autowired-qualifiers.html
+
+## 6. 실행·빌드·테스트 방법
+
+애플리케이션 실행:
 
 ```bash
 ./gradlew bootRun
 ```
 
-### 3.2 API 호출 예시
+테스트 실행(태스크 범위):
 
 ```bash
-curl "http://localhost:8080/mission02/task01/greetings?name=%20%20%EC%8A%A4%ED%94%84%EB%A7%81%20%20%ED%95%99%EC%8A%B5%EC%9E%90%20%20"
-```
-
-예상 응답:
-
-```json
-{
-  "message": "안녕하세요, 스프링 학습자님. 애너테이션 기반 빈 주입이 정상 동작했습니다.",
-  "selectedPolicy": "formalGreetingPolicy",
-  "injectionType": "@Autowired + @Inject"
-}
-```
-
-### 3.3 테스트 실행
-
-```bash
-./gradlew test --tests "*AnnotationGreetingServiceTest"
+./gradlew test --tests "*task01_annotation_injection*"
 ```
 
 예상 결과:
-- 테스트 2건 성공
-- 애너테이션 주입 체인(`@Autowired`, `@Inject`)이 실제 스프링 컨테이너에서 정상 동작
+- 태스크 관련 테스트가 모두 통과해야 합니다.
+- 실패 시 문서의 파일별 코드 블록과 테스트 코드를 함께 확인합니다.
 
-## 4. 결과 확인 방법
+## 7. 결과 확인 방법
 
-- 브라우저 또는 `curl`로 `GET /mission02/task01/greetings` 호출
-- `name` 파라미터를 비우거나 공백만 전달했을 때 응답 메시지에 `손님`이 포함되는지 확인
-- 테스트 리포트에서 `AnnotationGreetingServiceTest` 성공 여부 확인
+- 컨트롤러가 있는 태스크는 API 호출(curl/브라우저)로 응답 구조와 상태 코드를 확인합니다.
+- SQL 로그/애스펙트 로그/콘솔 출력이 필요한 태스크는 실행 로그를 함께 확인합니다.
+- 필요 시 실행 결과를 캡처해 태스크 문서 디렉토리에 PNG로 저장합니다.
 
-## 학습 내용
+## 8. 학습 내용
 
-- `@Component`는 클래스를 스프링 빈으로 등록하며, 동일 타입 구현체가 여러 개면 빈 이름이나 `@Qualifier`로 주입 대상을 구분해야 합니다.
-- `@Autowired`는 스프링이 타입을 기준으로 의존성을 찾고 주입합니다. 생성자 주입에 사용하면 객체 생성 시점에 필요한 의존성이 강제되어 안전합니다.
-- `@Inject`는 JSR-330 표준 애너테이션으로, 스프링에서도 동일하게 의존성 주입에 사용할 수 있습니다. 프레임워크에 덜 종속적인 코드 작성에 도움이 됩니다.
-- 입력 정규화 책임(`NameNormalizer`)과 메시지 정책 책임(`GreetingPolicy`)을 분리하면, 기능 변경 시 영향 범위를 줄이고 테스트를 단순화할 수 있습니다.
+- 파일 경로 인덱스를 먼저 확인하면 전체 구조를 빠르게 파악할 수 있습니다.
+- 컨트롤러-서비스-저장소(또는 정책/도메인) 흐름을 분리하면 변경 지점을 명확히 관리할 수 있습니다.
+- 공식 문서를 기준으로 개념을 확인하면서 코드와 연결하면 실습 재현성이 높아집니다.

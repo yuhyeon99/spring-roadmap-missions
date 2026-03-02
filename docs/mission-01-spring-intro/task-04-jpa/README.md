@@ -1,207 +1,46 @@
 # JPA와 스프링 데이터 JPA로 CRUD 구현하기
 
-이 문서는 `mission-01-spring-intro`의 `task-04-jpa` 구현을 코드 중심으로 정리한 보고서입니다.  
-문서만 읽어도 구조와 동작을 이해할 수 있도록, 파일 인덱스/흐름 설명/개념 링크/전체 코드(토글)를 함께 제공합니다.
+이 문서는 `mission-01-spring-intro`의 `task-04-jpa` 구현을 동일 포맷으로 정리한 보고서입니다.
+파일 경로 인덱스, 파일별 상세 설명, 핵심 개념 링크, 전체 코드 토글을 함께 제공합니다.
 
 ## 1. 작업 개요
 
 - 미션/태스크: `mission-01-spring-intro` / `task-04-jpa`
-- 목표: 회원(Member) CRUD API를 Spring Data JPA로 구현
-- 베이스 경로: `/mission01/task04/members`
-- 핵심 포인트:
-  - JPA 엔티티 매핑
-  - `JpaRepository` 기반 CRUD
-  - 서비스 계층 트랜잭션 처리
-  - REST API 응답 코드/Location 헤더 처리
+- 소스 패키지: `com.goorm.springmissionsplayground.mission01_spring_intro.task04_jpa`
+- 코드 파일 수(테스트 포함): **8개**
+- 주요 API 베이스 경로:
+  - `/mission01/task04/members` (MemberJpaController.java)
 
-## 2. 코드 파일 인덱스
+## 2. 코드 파일 경로 인덱스
 
-| 구분 | 파일 경로 | 역할 |
-|---|---|---|
-| Domain | `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/domain/Member.java` | JPA 엔티티 (`members` 테이블 매핑) |
-| Repository | `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/repository/MemberJpaRepository.java` | `JpaRepository<Member, Long>` 기반 DB 접근 |
-| Service | `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/service/MemberJpaService.java` | 비즈니스 로직 + 트랜잭션 경계 |
-| Controller | `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/controller/MemberJpaController.java` | HTTP 요청/응답 처리 |
-| DTO(Request) | `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/dto/MemberRequest.java` | 생성/수정 요청 본문 |
-| DTO(Response) | `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/dto/MemberResponse.java` | API 응답 객체 |
-| Config | `src/main/resources/application.properties` | H2/JPA 실행 설정 |
+| 파일 경로 | 역할 |
+|---|---|
+| `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/controller/MemberJpaController.java` | HTTP 요청을 받아 입력을 바인딩하고 서비스 결과를 응답으로 반환 |
+| `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/domain/Member.java` | 도메인 상태와 규칙을 표현하는 모델 |
+| `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/dto/MemberRequest.java` | 계층 간 데이터 전달 형식(요청/응답) |
+| `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/dto/MemberResponse.java` | 계층 간 데이터 전달 형식(요청/응답) |
+| `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/repository/MemberJpaRepository.java` | 데이터 저장/조회 추상화 계층 |
+| `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/service/MemberJpaService.java` | 핵심 비즈니스 로직과 흐름 제어를 담당 |
+| `src/main/resources/application.properties` | 실행 환경, DB, JPA, 로깅 등 애플리케이션 설정 |
+| `src/test/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/MemberServiceTest.java` | 핵심 동작을 자동 검증하는 테스트 코드 |
 
-## 3. 요청 처리 흐름 상세
+## 3. 구현 흐름 요약
 
-`POST /mission01/task04/members` 기준:
-
-1. `MemberJpaController#create()`가 `MemberRequest`를 받습니다.
-2. `MemberJpaService#create(name, email)`를 호출합니다.
-3. 서비스에서 `new Member(name, email)` 생성 후 `memberRepository.save(member)`를 호출합니다.
-4. JPA가 INSERT를 수행하고 생성된 ID가 엔티티에 반영됩니다.
-5. 컨트롤러는 `201 Created`와 `Location: /mission01/task04/members/{id}`를 응답합니다.
-
-`PUT /mission01/task04/members/{id}` 기준:
-
-1. 서비스 `findById(id)`로 엔티티를 조회합니다.
-2. 조회한 엔티티에 `member.update(name, email)`을 적용합니다.
-3. `@Transactional` 범위 내 변경 감지(Dirty Checking)로 커밋 시 UPDATE가 반영됩니다.
+1. 컨트롤러(있다면)에서 요청을 수신하고 입력을 DTO/파라미터로 변환합니다.
+2. 서비스 계층에서 핵심 규칙(검증, 계산, 트랜잭션, 정책 선택)을 수행합니다.
+3. 저장소/도메인 계층과 협력해 상태를 조회·변경하고 결과를 응답으로 반환합니다.
+4. 테스트 코드에서 정상/예외 흐름을 검증해 동작을 고정합니다.
 
 ## 4. 파일별 상세 설명 + 전체 코드
 
-### 4.1 Entity: Member
+### 4.1 `MemberJpaController.java`
 
-- 엔티티 선언: `@Entity`, `@Table(name = "members")`
-- PK 전략: `@GeneratedValue(strategy = GenerationType.IDENTITY)`
-- 핵심 메서드: `update(name, email)`로 상태 변경
-- 이유:
-  - 엔티티 내부에 상태 변경 로직을 두면 변경 지점을 명확히 관리할 수 있습니다.
-  - 기본 생성자(`protected Member()`)는 JPA 프록시/리플렉션 생성에 필요합니다.
-
-<details>
-<summary><code>Member.java</code> 전체 코드</summary>
-
-```java
-package com.goorm.springmissionsplayground.mission01_spring_intro.task04_jpa.domain;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "members")
-public class Member {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String name;
-    private String email;
-
-    protected Member() {
-        // JPA 기본 생성자
-    }
-
-    public Member(String name, String email) {
-        this.name = name;
-        this.email = email;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void update(String name, String email) {
-        this.name = name;
-        this.email = email;
-    }
-}
-```
-
-</details>
-
-### 4.2 Repository: MemberJpaRepository
-
-- `JpaRepository<Member, Long>` 상속으로 기본 CRUD 자동 제공
-- 별도 구현 클래스 없이 인터페이스만 선언해도 스프링 데이터 JPA가 런타임 프록시를 생성합니다.
-
-<details>
-<summary><code>MemberJpaRepository.java</code> 전체 코드</summary>
-
-```java
-package com.goorm.springmissionsplayground.mission01_spring_intro.task04_jpa.repository;
-
-import com.goorm.springmissionsplayground.mission01_spring_intro.task04_jpa.domain.Member;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public interface MemberJpaRepository extends JpaRepository<Member, Long> {
-}
-```
-
-</details>
-
-### 4.3 Service: MemberJpaService
-
-- 클래스 레벨 `@Transactional`: 쓰기 작업 기본 트랜잭션
-- 조회 메서드 `findAll`, `findById`는 `@Transactional(readOnly = true)` 적용
-- `findById` 실패 시 `ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found")`으로 404 처리
-- `update`는 조회 후 엔티티 변경만 수행하고, 커밋 시점에 UPDATE SQL 반영
-
-<details>
-<summary><code>MemberJpaService.java</code> 전체 코드</summary>
-
-```java
-package com.goorm.springmissionsplayground.mission01_spring_intro.task04_jpa.service;
-
-import com.goorm.springmissionsplayground.mission01_spring_intro.task04_jpa.domain.Member;
-import com.goorm.springmissionsplayground.mission01_spring_intro.task04_jpa.repository.MemberJpaRepository;
-import java.util.List;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
-
-@Service("memberJpaService")
-@Transactional
-public class MemberJpaService {
-
-    private final MemberJpaRepository memberRepository;
-
-    public MemberJpaService(MemberJpaRepository memberRepository) {
-        this.memberRepository = memberRepository;
-    }
-
-    public Member create(String name, String email) {
-        Member member = new Member(name, email);
-        return memberRepository.save(member);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Member> findAll() {
-        return memberRepository.findAll();
-    }
-
-    @Transactional(readOnly = true)
-    public Member findById(Long id) {
-        return memberRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
-    }
-
-    public Member update(Long id, String name, String email) {
-        Member member = findById(id);
-        member.update(name, email);
-        return member;
-    }
-
-    public void delete(Long id) {
-        if (!memberRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found");
-        }
-        memberRepository.deleteById(id);
-    }
-}
-```
-
-</details>
-
-### 4.4 Controller: MemberJpaController
-
-- 경로: `@RequestMapping("/mission01/task04/members")`
-- 메서드별 역할:
-  - `create`: 생성 후 `201 Created` + `Location` 헤더 반환
-  - `list`: 전체 조회
-  - `findOne`: 단건 조회
-  - `update`: 수정
-  - `delete`: 삭제 후 `204 No Content`
-- 엔티티를 바로 노출하지 않고 `MemberResponse`로 변환해 응답 스펙을 안정적으로 유지합니다.
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/controller/MemberJpaController.java`
+- 역할: HTTP 요청을 받아 입력을 바인딩하고 서비스 결과를 응답으로 반환
+- 상세 설명:
+- 요청 URI와 HTTP 메서드를 메서드에 매핑해 외부 진입점을 구성합니다.
+- 요청 DTO/파라미터를 검증 가능한 형태로 서비스 계층에 전달합니다.
+- 응답 상태 코드와 응답 DTO를 통해 API 계약을 고정합니다.
 
 <details>
 <summary><code>MemberJpaController.java</code> 전체 코드</summary>
@@ -274,10 +113,74 @@ public class MemberJpaController {
 
 </details>
 
-### 4.5 DTO: MemberRequest
+### 4.2 `Member.java`
 
-- 요청 본문 바인딩용 객체
-- 기본 생성자가 있어야 JSON 역직렬화(Jackson) 시 생성 가능합니다.
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/domain/Member.java`
+- 역할: 도메인 상태와 규칙을 표현하는 모델
+- 상세 설명:
+- 비즈니스에서 다루는 상태를 필드로 표현하고, 필요한 변경 메서드를 제공합니다.
+- 엔티티인 경우 JPA 매핑 애너테이션으로 테이블/식별자 전략을 정의합니다.
+
+<details>
+<summary><code>Member.java</code> 전체 코드</summary>
+
+```java
+package com.goorm.springmissionsplayground.mission01_spring_intro.task04_jpa.domain;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "members")
+public class Member {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private String email;
+
+    protected Member() {
+        // JPA 기본 생성자
+    }
+
+    public Member(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void update(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+}
+```
+
+</details>
+
+### 4.3 `MemberRequest.java`
+
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/dto/MemberRequest.java`
+- 역할: 계층 간 데이터 전달 형식(요청/응답)
+- 상세 설명:
+- 요청/응답 전용 구조를 분리해 도메인 모델의 직접 노출을 방지합니다.
+- API 스펙 변경이 도메인 내부 구조에 전파되지 않도록 완충 계층 역할을 합니다.
 
 <details>
 <summary><code>MemberRequest.java</code> 전체 코드</summary>
@@ -309,10 +212,13 @@ public class MemberRequest {
 
 </details>
 
-### 4.6 DTO: MemberResponse
+### 4.4 `MemberResponse.java`
 
-- 응답 전용 객체
-- `from(Member member)` 정적 팩토리 메서드로 변환 로직을 한 곳에 모았습니다.
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/dto/MemberResponse.java`
+- 역할: 계층 간 데이터 전달 형식(요청/응답)
+- 상세 설명:
+- 요청/응답 전용 구조를 분리해 도메인 모델의 직접 노출을 방지합니다.
+- API 스펙 변경이 도메인 내부 구조에 전파되지 않도록 완충 계층 역할을 합니다.
 
 <details>
 <summary><code>MemberResponse.java</code> 전체 코드</summary>
@@ -353,15 +259,107 @@ public class MemberResponse {
 
 </details>
 
-### 4.7 환경 설정: application.properties
+### 4.5 `MemberJpaRepository.java`
 
-- H2 인메모리 DB 사용
-- `ddl-auto=create-drop`으로 실행 시 스키마 생성/종료 시 제거
-- SQL 로그 출력 활성화
-- H2 콘솔 경로 `/h2-console` 활성화
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/repository/MemberJpaRepository.java`
+- 역할: 데이터 저장/조회 추상화 계층
+- 상세 설명:
+- 저장소 인터페이스로 데이터 접근을 추상화해 구현 교체 가능성을 확보합니다.
+- 도메인 객체의 조회/저장 책임을 서비스에서 분리합니다.
 
 <details>
-<summary><code>application.properties</code> 코드</summary>
+<summary><code>MemberJpaRepository.java</code> 전체 코드</summary>
+
+```java
+package com.goorm.springmissionsplayground.mission01_spring_intro.task04_jpa.repository;
+
+import com.goorm.springmissionsplayground.mission01_spring_intro.task04_jpa.domain.Member;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface MemberJpaRepository extends JpaRepository<Member, Long> {
+}
+```
+
+</details>
+
+### 4.6 `MemberJpaService.java`
+
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/service/MemberJpaService.java`
+- 역할: 핵심 비즈니스 로직과 흐름 제어를 담당
+- 상세 설명:
+- 비즈니스 규칙을 한 곳에 모아 컨트롤러와 저장소 책임을 분리합니다.
+- 트랜잭션 경계, 예외 처리, 정책 선택 같은 핵심 흐름을 제어합니다.
+- 테스트 시 서비스 단위로 핵심 동작을 검증하기 쉬운 구조를 제공합니다.
+
+<details>
+<summary><code>MemberJpaService.java</code> 전체 코드</summary>
+
+```java
+package com.goorm.springmissionsplayground.mission01_spring_intro.task04_jpa.service;
+
+import com.goorm.springmissionsplayground.mission01_spring_intro.task04_jpa.domain.Member;
+import com.goorm.springmissionsplayground.mission01_spring_intro.task04_jpa.repository.MemberJpaRepository;
+import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+@Service("memberJpaService")
+@Transactional
+public class MemberJpaService {
+
+    private final MemberJpaRepository memberRepository;
+
+    public MemberJpaService(MemberJpaRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
+
+    public Member create(String name, String email) {
+        Member member = new Member(name, email);
+        return memberRepository.save(member);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Member> findAll() {
+        return memberRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Member findById(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
+    }
+
+    public Member update(Long id, String name, String email) {
+        Member member = findById(id);
+        member.update(name, email);
+        return member;
+    }
+
+    public void delete(Long id) {
+        if (!memberRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found");
+        }
+        memberRepository.deleteById(id);
+    }
+}
+```
+
+</details>
+
+### 4.7 `application.properties`
+
+- 파일 경로: `src/main/resources/application.properties`
+- 역할: 실행 환경, DB, JPA, 로깅 등 애플리케이션 설정
+- 상세 설명:
+- 실행 환경에 맞는 설정을 코드 변경 없이 외부화합니다.
+- 학습/테스트 반복을 위한 DB/JPA/콘솔 설정을 한 곳에서 관리합니다.
+
+<details>
+<summary><code>application.properties</code> 전체 코드</summary>
 
 ```properties
 spring.application.name=core
@@ -384,89 +382,94 @@ spring.h2.console.path=/h2-console
 
 </details>
 
-## 5. 새로 나온 개념 정리 + 공식 문서 링크
+### 4.8 `MemberServiceTest.java`
 
-### 5.1 Spring Data JPA (`JpaRepository`)
+- 파일 경로: `src/test/java/com/goorm/springmissionsplayground/mission01_spring_intro/task04_jpa/MemberServiceTest.java`
+- 역할: 핵심 동작을 자동 검증하는 테스트 코드
+- 상세 설명:
+- 요구사항을 테스트 시나리오로 고정해 회귀를 빠르게 감지합니다.
+- 핵심 분기(정상/예외)를 검증해 구현 의도를 보장합니다.
 
-- 핵심: 인터페이스 상속만으로 CRUD 구현체를 자동 생성합니다.
-- 왜 쓰는가: 반복적인 DAO/SQL 코드를 줄이고, 비즈니스 로직에 집중할 수 있습니다.
-- 참고:
-  - Spring Data JPA Reference: https://docs.spring.io/spring-data/jpa/reference/
+<details>
+<summary><code>MemberServiceTest.java</code> 전체 코드</summary>
 
-### 5.2 JPA Entity 매핑 (`@Entity`, `@Id`, `@GeneratedValue`)
+```java
+package com.goorm.springmissionsplayground.mission01_spring_intro.task04_jpa;
 
-- 핵심: 자바 객체와 DB 테이블을 매핑합니다.
-- 왜 쓰는가: 객체 중심 개발과 DB 영속화를 연결할 수 있습니다.
-- 참고:
-  - Jakarta Persistence Specification: https://jakarta.ee/specifications/persistence/
-  - Hibernate ORM User Guide: https://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html
+import com.goorm.springmissionsplayground.mission01_spring_intro.task04_jpa.domain.Member;
+import com.goorm.springmissionsplayground.mission01_spring_intro.task04_jpa.service.MemberJpaService;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-### 5.3 트랜잭션 (`@Transactional`, Dirty Checking)
+import static org.assertj.core.api.Assertions.assertThat;
 
-- 핵심: 서비스 로직을 하나의 원자적 작업 단위로 묶고, 엔티티 변경을 커밋 시 반영합니다.
-- 왜 쓰는가: 데이터 정합성과 예외 시 롤백을 보장하기 위함입니다.
-- 참고:
-  - Spring Framework Transaction Docs: https://docs.spring.io/spring-framework/reference/data-access/transaction.html
+@SpringBootTest
+@Transactional
+class MemberServiceTest {
 
-### 5.4 H2 인메모리 DB
+    @Autowired
+    MemberJpaService memberService;
 
-- 핵심: 실행 중 메모리 기반 DB를 사용해 실습/테스트를 빠르게 반복할 수 있습니다.
-- 왜 쓰는가: 별도 DB 설치 없이 개발 초기 검증이 가능합니다.
-- 참고:
-  - H2 Database 공식 문서: https://h2database.com/html/main.html
+    @Test
+    void create_read_update_delete() {
+        Member created = memberService.create("JPA User", "jpa@example.com");
 
-## 6. 실행·검증 방법
+        Member found = memberService.findById(created.getId());
+        assertThat(found.getName()).isEqualTo("JPA User");
 
-### 6.1 실행
+        Member updated = memberService.update(created.getId(), "Updated", "updated@example.com");
+        assertThat(updated.getName()).isEqualTo("Updated");
+
+        List<Member> members = memberService.findAll();
+        assertThat(members).hasSize(1);
+
+        memberService.delete(created.getId());
+        assertThat(memberService.findAll()).isEmpty();
+    }
+}
+```
+
+</details>
+
+## 5. 새로 나온 개념 정리 + 참고 링크
+
+- **Spring Data JPA (`JpaRepository`)**: 인터페이스 상속만으로 기본 CRUD를 제공합니다.  
+  공식 문서: https://docs.spring.io/spring-data/jpa/reference/
+- **JPA 엔티티 매핑**: 객체와 테이블을 매핑하고 식별자 전략을 지정합니다.  
+  공식 문서: https://jakarta.ee/specifications/persistence/
+- **트랜잭션과 변경 감지**: 트랜잭션 안에서 엔티티 변경 시 커밋 시점에 반영됩니다.  
+  공식 문서: https://docs.spring.io/spring-framework/reference/data-access/transaction.html
+
+## 6. 실행·빌드·테스트 방법
+
+애플리케이션 실행:
 
 ```bash
 ./gradlew bootRun
 ```
 
-### 6.2 API 호출 예시
-
-회원 생성:
+테스트 실행(태스크 범위):
 
 ```bash
-curl -i -X POST http://localhost:8080/mission01/task04/members \
-  -H "Content-Type: application/json" \
-  -d '{"name":"JPA User","email":"jpa@example.com"}'
+./gradlew test --tests "*task04_jpa*"
 ```
 
-전체 조회:
+예상 결과:
+- 태스크 관련 테스트가 모두 통과해야 합니다.
+- 실패 시 문서의 파일별 코드 블록과 테스트 코드를 함께 확인합니다.
 
-```bash
-curl http://localhost:8080/mission01/task04/members
-```
+## 7. 결과 확인 방법
 
-단건 조회:
+- 컨트롤러가 있는 태스크는 API 호출(curl/브라우저)로 응답 구조와 상태 코드를 확인합니다.
+- SQL 로그/애스펙트 로그/콘솔 출력이 필요한 태스크는 실행 로그를 함께 확인합니다.
+- 현재 태스크 디렉토리의 스크린샷 파일:
+  - `img.png`
 
-```bash
-curl http://localhost:8080/mission01/task04/members/1
-```
+## 8. 학습 내용
 
-수정:
-
-```bash
-curl -X PUT http://localhost:8080/mission01/task04/members/1 \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Updated","email":"updated@example.com"}'
-```
-
-삭제:
-
-```bash
-curl -X DELETE http://localhost:8080/mission01/task04/members/1
-```
-
-### 6.3 예상 결과
-
-- 생성: `201 Created` + `Location` 헤더 포함
-- 삭제: `204 No Content`
-- 존재하지 않는 ID 조회/수정/삭제: `404 Not Found`
-
-## 7. 결과 확인(스크린샷)
-
-- 예시 이미지: `img.png`
-
-![task04-jpa-run-result](img.png)
+- 파일 경로 인덱스를 먼저 확인하면 전체 구조를 빠르게 파악할 수 있습니다.
+- 컨트롤러-서비스-저장소(또는 정책/도메인) 흐름을 분리하면 변경 지점을 명확히 관리할 수 있습니다.
+- 공식 문서를 기준으로 개념을 확인하면서 코드와 연결하면 실습 재현성이 높아집니다.

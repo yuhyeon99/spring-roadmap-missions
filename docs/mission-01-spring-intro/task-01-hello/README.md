@@ -1,12 +1,39 @@
 # Spring Boot "Hello, World!" API 설정
 
-이 문서는 Spring 입문 미션(`mission-01-spring-intro`)의 첫 번째 테스크(`task-01-hello`)에서 기본적인 "Hello, World!" REST API 엔드포인트를 설정한 과정을 정리합니다.
+이 문서는 `mission-01-spring-intro`의 `task-01-hello` 구현을 동일 포맷으로 정리한 보고서입니다.
+파일 경로 인덱스, 파일별 상세 설명, 핵심 개념 링크, 전체 코드 토글을 함께 제공합니다.
 
-## 1. 컨트롤러 구현
+## 1. 작업 개요
 
-`src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task01_hello/` 디렉토리에 `HelloWorldController.java` 파일이 생성되었습니다. 이 컨트롤러는 Spring의 `@RestController` 및 `@GetMapping` 어노테이션을 사용하여 간단한 엔드포인트를 노출합니다.
+- 미션/태스크: `mission-01-spring-intro` / `task-01-hello`
+- 소스 패키지: `com.goorm.springmissionsplayground.mission01_spring_intro.task01_hello`
+- 코드 파일 수(테스트 포함): **1개**
 
-**파일: `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task01_hello/HelloWorldController.java`**
+## 2. 코드 파일 경로 인덱스
+
+| 파일 경로 | 역할 |
+|---|---|
+| `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task01_hello/HelloWorldController.java` | HTTP 요청을 받아 문자열 응답을 반환하는 REST 컨트롤러 |
+
+## 3. 구현 흐름 요약
+
+1. 컨트롤러(있다면)에서 요청을 수신하고 입력을 DTO/파라미터로 변환합니다.
+2. 서비스 계층에서 핵심 규칙(검증, 계산, 트랜잭션, 정책 선택)을 수행합니다.
+3. 저장소/도메인 계층과 협력해 상태를 조회·변경하고 결과를 응답으로 반환합니다.
+4. 테스트 코드에서 정상/예외 흐름을 검증해 동작을 고정합니다.
+
+## 4. 파일별 상세 설명 + 전체 코드
+
+### 4.1 `HelloWorldController.java`
+
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission01_spring_intro/task01_hello/HelloWorldController.java`
+- 역할: HTTP 요청을 받아 문자열 응답을 반환하는 REST 컨트롤러
+- 상세 설명:
+- `GET /hello` 요청을 `helloWorld()` 메서드에 매핑해 기본 엔드포인트를 노출합니다.
+- 스프링 MVC의 요청 처리 흐름(컨트롤러 매핑, 응답 직렬화) 학습용 최소 예제를 제공합니다.
+
+<details>
+<summary><code>HelloWorldController.java</code> 전체 코드</summary>
 
 ```java
 package com.goorm.springmissionsplayground.mission01_spring_intro.task01_hello;
@@ -24,106 +51,34 @@ public class HelloWorldController {
 }
 ```
 
-## 2. 빌드 구성 업데이트
+</details>
 
-`build.gradle` 파일은 Spring Boot로 웹 애플리케이션을 개발하는 데 필수적인 `spring-boot-starter-web` 의존성을 포함하도록 업데이트되었습니다.
+## 5. 새로 나온 개념 정리 + 참고 링크
 
-**파일: `build.gradle` (관련 섹션)**
+- **`@RestController`와 요청 매핑**: 컨트롤러 메서드를 HTTP 엔드포인트로 노출합니다.  
+  공식 문서: https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller.html
+- **Spring Boot 자동 구성(Auto Configuration)**: 웹 서버/DispatcherServlet을 기본 설정으로 자동 구성합니다.  
+  공식 문서: https://docs.spring.io/spring-boot/reference/using/auto-configuration.html
 
-```gradle
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-```
+## 6. 실행·빌드·테스트 방법
 
-## 3. 애플리케이션 실행 방법
-
-Spring Boot 애플리케이션을 실행하려면 터미널에서 프로젝트의 루트 디렉토리로 이동하여 다음 명령을 실행합니다:
+애플리케이션 실행:
 
 ```bash
 ./gradlew bootRun
 ```
 
-애플리케이션이 시작되면 Spring Boot가 특정 포트(기본값은 8080)에서 시작되었음을 나타내는 로그를 볼 수 있습니다.
+테스트 실행(참고):
+- 현재 태스크 전용 테스트 파일은 없습니다. 필요하면 추후 테스트를 추가합니다.
 
-## 4. API 엔드포인트 테스트 방법
+## 7. 결과 확인 방법
 
-애플리케이션이 실행 중이면 새 터미널 창에서 `curl`을 사용하거나 웹 브라우저에서 열어 "Hello, World!" API 엔드포인트를 테스트할 수 있습니다.
+- 컨트롤러가 있는 태스크는 API 호출(curl/브라우저)로 응답 구조와 상태 코드를 확인합니다.
+- SQL 로그/애스펙트 로그/콘솔 출력이 필요한 태스크는 실행 로그를 함께 확인합니다.
+- 필요 시 실행 결과를 캡처해 태스크 문서 디렉토리에 PNG로 저장합니다.
 
-**`curl` 사용:**
+## 8. 학습 내용
 
-```bash
-curl http://localhost:8080/hello
-```
-
-**예상 출력:**
-
-```
-Hello, World!
-```
-
-**웹 브라우저 사용:**
-
-웹 브라우저를 열고 다음 주소로 이동합니다:
-
-```
-http://localhost:8080/hello
-```
-
-**결과 (스크린샷):**
-
-<img width="424" height="149" alt="image" src="https://github.com/user-attachments/assets/f255d537-89da-47f7-884b-3425ada38d8a" />
-
-
----
-
-## 학습 내용
-
-이 섹션에서는 구현된 코드와 관련된 핵심 개념들을 설명합니다.
-
-### 어노테이션(Annotation)이란?
-
-어노테이션은 자바 코드에 메타데이터(코드에 대한 정보)를 추가하는 방법입니다. 코드 자체의 동작에 직접적인 영향을 주지 않으면서, 컴파일러나 런타임 시에 특정 작업을 수행하거나 코드의 의미를 부여하는 데 사용됩니다. Spring 프레임워크는 어노테이션을 광범위하게 사용하여 개발자가 XML 설정 대신 코드로 기능을 정의할 수 있도록 돕습니다.
-
-### `@RestController` 어노테이션
-
-`@RestController`는 Spring 프레임워크에서 RESTful 웹 서비스의 컨트롤러를 정의할 때 사용되는 어노테이션입니다. 이 어노테이션은 두 가지 주요 어노테이션의 조합입니다:
-
-1.  **`@Controller`**: 이 클래스가 웹 요청을 처리하는 컨트롤러임을 나타냅니다.
-2.  **`@ResponseBody`**: 이 어노테이션이 붙은 메서드의 반환 값이 HTTP 응답 본문(body)으로 직접 전송됨을 의미합니다. 일반적으로 객체를 JSON/XML 형태로 변환하여 전송합니다. `HelloWorldController`의 경우, `String` 타입이 그대로 응답 본문이 됩니다.
-
-`@RestController`를 사용하면 별도의 뷰(HTML 파일 등)를 반환하지 않고, 데이터(예: JSON, XML, Plain Text)를 직접 응답으로 반환하는 REST API를 쉽게 구현할 수 있습니다.
-
-### `@GetMapping` 어노테이션
-
-`@GetMapping`은 HTTP GET 요청을 특정 핸들러 메서드에 매핑하는 어노테이션입니다. 이는 `@RequestMapping(method = RequestMethod.GET)`의 단축형입니다.
-
-*   `@GetMapping("/hello")`: 이 어노테이션은 `/hello` 경로로 들어오는 HTTP GET 요청을 `helloWorld()` 메서드가 처리하도록 지시합니다. 사용자가 웹 브라우저에서 `http://localhost:8080/hello`와 같이 해당 URL에 접속하면, Spring은 이 메서드를 호출하여 반환 값을 클라이언트에게 전송합니다.
-
-### `build.gradle` 파일
-
-`build.gradle`은 Gradle 빌드 자동화 도구에서 사용되는 빌드 스크립트 파일입니다. 이 파일은 프로젝트의 의존성 관리, 태스크 정의, 빌드 프로세스 구성 등 프로젝트를 빌드하고 관리하는 데 필요한 모든 정보를 담고 있습니다.
-
-*   **의존성 관리**: `dependencies` 블록에서 프로젝트가 필요로 하는 외부 라이브러리(JAR 파일)들을 선언합니다. Gradle은 이 정보를 바탕으로 필요한 라이브러리를 자동으로 다운로드하고 빌드 경로에 포함시킵니다.
-
-### `spring-boot-starter-web` 의존성 (Dependency)
-
-`spring-boot-starter-web`은 Spring Boot에서 웹 애플리케이션(RESTful 서비스 포함)을 개발하기 위한 핵심 스타터(Starter) 의존성입니다. "스타터"는 개발에 필요한 공통적인 의존성들을 한데 묶어 제공하여, 개발자가 개별 의존성을 일일이 추가할 필요 없이 편리하게 기능을 사용할 수 있도록 합니다.
-
-`spring-boot-starter-web`에는 다음과 같은 주요 의존성들이 포함되어 있습니다:
-
-*   **Spring MVC**: 웹 애플리케이션 개발을 위한 프레임워크.
-*   **Tomcat**: 내장형 웹 서버. 별도의 서버 설치 없이 Spring Boot 애플리케이션을 단독으로 실행할 수 있게 해줍니다.
-*   **Jackson**: JSON 데이터를 처리하기 위한 라이브러리.
-*   **Validation**: 데이터 유효성 검사를 위한 라이브러리.
-
-이 의존성을 추가함으로써, `@RestController`, `@GetMapping`과 같은 웹 관련 어노테이션과 내장 톰캣 서버를 사용하여 즉시 웹 서비스를 개발하고 실행할 수 있게 됩니다.
-
-### 엔드포인트(Endpoint)란?
-
-소프트웨어 시스템에서 "엔드포인트"는 통신이 이루어지는 지점을 의미합니다. REST API의 맥락에서는 클라이언트가 서버의 특정 자원(resource)에 접근하기 위해 사용하는 URL 경로를 지칭합니다.
-
-*   예를 들어, `http://localhost:8080/hello`에서 `/hello`가 엔드포인트입니다. 클라이언트(웹 브라우저, `curl` 등)는 이 엔드포인트로 HTTP 요청을 보내고, 서버는 해당 요청을 처리하여 응답을 반환합니다. 각 엔드포인트는 특정 기능을 수행하며, HTTP 메서드(GET, POST, PUT, DELETE 등)에 따라 다른 작업을 수행할 수 있습니다.
+- 파일 경로 인덱스를 먼저 확인하면 전체 구조를 빠르게 파악할 수 있습니다.
+- 컨트롤러-서비스-저장소(또는 정책/도메인) 흐름을 분리하면 변경 지점을 명확히 관리할 수 있습니다.
+- 공식 문서를 기준으로 개념을 확인하면서 코드와 연결하면 실습 재현성이 높아집니다.

@@ -1,98 +1,315 @@
 # 스프링 핵심 원리 - 기본: 순환 의존성 해결하기
 
-이 문서는 `mission-02-spring-core-basic`의 `task-02-circular-dependency` 작업 내용을 정리한 보고서입니다.  
-스프링에서 순환 의존성이 발생하는 상황을 테스트로 재현하고, `@Lazy` 프록시를 사용해 실제 애플리케이션 코드에서 순환 참조를 해소했습니다.
+이 문서는 `mission-02-spring-core-basic`의 `task-02-circular-dependency` 구현을 동일 포맷으로 정리한 보고서입니다.
+파일 경로 인덱스, 파일별 상세 설명, 핵심 개념 링크, 전체 코드 토글을 함께 제공합니다.
 
 ## 1. 작업 개요
 
-- 패키지: `com.goorm.springmissionsplayground.mission02_spring_core_basic.task02_circular_dependency`
-- 목표:
-  - 생성자 주입만 사용할 때 발생하는 순환 의존성 실패 상황을 재현한다.
-  - 순환 구조를 유지한 채 `@Lazy`를 적용해 컨테이너 초기화 실패를 해결한다.
-  - API 호출과 테스트 실행으로 해결 여부를 확인한다.
-- 시나리오:
-  - 주문 서비스(`OrderWorkflowService`)와 결제 서비스(`PaymentWorkflowService`)가 서로를 참조하는 구조를 구성한다.
-  - 결제 서비스 쪽 의존성에 `@Lazy`를 적용해 초기 생성 시점의 순환 참조를 프록시로 지연 처리한다.
+- 미션/태스크: `mission-02-spring-core-basic` / `task-02-circular-dependency`
+- 소스 패키지: `com.goorm.springmissionsplayground.mission02_spring_core_basic.task02_circular_dependency`
+- 코드 파일 수(테스트 포함): **5개**
+- 주요 API 베이스 경로:
+  - `/mission02/task02/circular-dependency` (CircularDependencyController.java)
 
-## 2. 구현 단계와 주요 코드
+## 2. 코드 파일 경로 인덱스
 
-### 2.1 해결된 순환 의존성 구조 구현
+| 파일 경로 | 역할 |
+|---|---|
+| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task02_circular_dependency/controller/CircularDependencyController.java` | HTTP 요청을 받아 입력을 바인딩하고 서비스 결과를 응답으로 반환 |
+| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task02_circular_dependency/dto/CircularDependencyResponse.java` | 계층 간 데이터 전달 형식(요청/응답) |
+| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task02_circular_dependency/service/OrderWorkflowService.java` | 핵심 비즈니스 로직과 흐름 제어를 담당 |
+| `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task02_circular_dependency/service/PaymentWorkflowService.java` | 핵심 비즈니스 로직과 흐름 제어를 담당 |
+| `src/test/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task02_circular_dependency/CircularDependencyResolutionTest.java` | 핵심 동작을 자동 검증하는 테스트 코드 |
 
-- `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task02_circular_dependency/service/OrderWorkflowService.java`
-- `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task02_circular_dependency/service/PaymentWorkflowService.java`
+## 3. 구현 흐름 요약
 
-`OrderWorkflowService`는 `PaymentWorkflowService`를 생성자 주입받고,  
-`PaymentWorkflowService`는 `@Lazy OrderWorkflowService`를 생성자 주입받도록 구현했습니다.
+1. 컨트롤러(있다면)에서 요청을 수신하고 입력을 DTO/파라미터로 변환합니다.
+2. 서비스 계층에서 핵심 규칙(검증, 계산, 트랜잭션, 정책 선택)을 수행합니다.
+3. 저장소/도메인 계층과 협력해 상태를 조회·변경하고 결과를 응답으로 반환합니다.
+4. 테스트 코드에서 정상/예외 흐름을 검증해 동작을 고정합니다.
 
-핵심 포인트:
-- 순환 참조 자체는 존재하지만, `@Lazy` 프록시가 먼저 주입되어 컨테이너 시작 단계에서 즉시 실체 빈 생성이 일어나지 않습니다.
-- 실제 메서드 호출 시점에 대상 빈이 초기화되어 실행됩니다.
+## 4. 파일별 상세 설명 + 전체 코드
 
-### 2.2 확인용 REST API 추가
+### 4.1 `CircularDependencyController.java`
 
-- `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task02_circular_dependency/controller/CircularDependencyController.java`
-- `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task02_circular_dependency/dto/CircularDependencyResponse.java`
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task02_circular_dependency/controller/CircularDependencyController.java`
+- 역할: HTTP 요청을 받아 입력을 바인딩하고 서비스 결과를 응답으로 반환
+- 상세 설명:
+- 요청 URI와 HTTP 메서드를 메서드에 매핑해 외부 진입점을 구성합니다.
+- 요청 DTO/파라미터를 검증 가능한 형태로 서비스 계층에 전달합니다.
+- 응답 상태 코드와 응답 DTO를 통해 API 계약을 고정합니다.
 
-`GET /mission02/task02/circular-dependency/resolve?orderId=...` 요청으로  
-주문/결제 처리 상태와 해결 방식 문자열을 함께 응답하도록 구성했습니다.
+<details>
+<summary><code>CircularDependencyController.java</code> 전체 코드</summary>
 
-### 2.3 실패 재현 + 해결 검증 테스트 작성
+```java
+package com.goorm.springmissionsplayground.mission02_spring_core_basic.task02_circular_dependency.controller;
 
-- `src/test/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task02_circular_dependency/CircularDependencyResolutionTest.java`
+import com.goorm.springmissionsplayground.mission02_spring_core_basic.task02_circular_dependency.dto.CircularDependencyResponse;
+import com.goorm.springmissionsplayground.mission02_spring_core_basic.task02_circular_dependency.service.OrderWorkflowService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-테스트 2개를 작성했습니다.
-- `circularDependency_withConstructorInjectionOnly_fails`:
-  - 테스트 내부의 `BrokenOrderService`/`BrokenPaymentService`를 생성자 주입만으로 등록
-  - 컨텍스트 `refresh()` 시 `BeanCurrentlyInCreationException` 루트 원인 발생 확인
-- `circularDependency_withLazyProxy_isResolved`:
-  - 실제 애플리케이션 빈(`OrderWorkflowService`) 호출
-  - 주문/결제 상태 문자열과 해결 메시지 검증
+@RestController
+@RequestMapping("/mission02/task02/circular-dependency")
+public class CircularDependencyController {
 
-## 3. 실행·빌드·테스트 방법과 예상 결과
+    private final OrderWorkflowService orderWorkflowService;
 
-### 3.1 애플리케이션 실행
+    public CircularDependencyController(OrderWorkflowService orderWorkflowService) {
+        this.orderWorkflowService = orderWorkflowService;
+    }
+
+    @GetMapping("/resolve")
+    public CircularDependencyResponse resolve(@RequestParam(defaultValue = "order-1001") String orderId) {
+        return orderWorkflowService.process(orderId);
+    }
+}
+```
+
+</details>
+
+### 4.2 `CircularDependencyResponse.java`
+
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task02_circular_dependency/dto/CircularDependencyResponse.java`
+- 역할: 계층 간 데이터 전달 형식(요청/응답)
+- 상세 설명:
+- 요청/응답 전용 구조를 분리해 도메인 모델의 직접 노출을 방지합니다.
+- API 스펙 변경이 도메인 내부 구조에 전파되지 않도록 완충 계층 역할을 합니다.
+
+<details>
+<summary><code>CircularDependencyResponse.java</code> 전체 코드</summary>
+
+```java
+package com.goorm.springmissionsplayground.mission02_spring_core_basic.task02_circular_dependency.dto;
+
+public class CircularDependencyResponse {
+
+    private final String orderId;
+    private final String orderState;
+    private final String paymentState;
+    private final String resolution;
+
+    public CircularDependencyResponse(
+            String orderId,
+            String orderState,
+            String paymentState,
+            String resolution
+    ) {
+        this.orderId = orderId;
+        this.orderState = orderState;
+        this.paymentState = paymentState;
+        this.resolution = resolution;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public String getOrderState() {
+        return orderState;
+    }
+
+    public String getPaymentState() {
+        return paymentState;
+    }
+
+    public String getResolution() {
+        return resolution;
+    }
+}
+```
+
+</details>
+
+### 4.3 `OrderWorkflowService.java`
+
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task02_circular_dependency/service/OrderWorkflowService.java`
+- 역할: 핵심 비즈니스 로직과 흐름 제어를 담당
+- 상세 설명:
+- 비즈니스 규칙을 한 곳에 모아 컨트롤러와 저장소 책임을 분리합니다.
+- 트랜잭션 경계, 예외 처리, 정책 선택 같은 핵심 흐름을 제어합니다.
+- 테스트 시 서비스 단위로 핵심 동작을 검증하기 쉬운 구조를 제공합니다.
+
+<details>
+<summary><code>OrderWorkflowService.java</code> 전체 코드</summary>
+
+```java
+package com.goorm.springmissionsplayground.mission02_spring_core_basic.task02_circular_dependency.service;
+
+import com.goorm.springmissionsplayground.mission02_spring_core_basic.task02_circular_dependency.dto.CircularDependencyResponse;
+import org.springframework.stereotype.Service;
+
+@Service
+public class OrderWorkflowService {
+
+    private final PaymentWorkflowService paymentWorkflowService;
+
+    public OrderWorkflowService(PaymentWorkflowService paymentWorkflowService) {
+        this.paymentWorkflowService = paymentWorkflowService;
+    }
+
+    public CircularDependencyResponse process(String orderId) {
+        String orderState = currentOrderState(orderId);
+        String paymentState = paymentWorkflowService.prepare(orderId);
+        return new CircularDependencyResponse(
+                orderId,
+                orderState,
+                paymentState,
+                "생성자 주입 + @Lazy 프록시로 순환 의존성을 해소"
+        );
+    }
+
+    public String currentOrderState(String orderId) {
+        return "ORDER_READY(" + orderId + ")";
+    }
+}
+```
+
+</details>
+
+### 4.4 `PaymentWorkflowService.java`
+
+- 파일 경로: `src/main/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task02_circular_dependency/service/PaymentWorkflowService.java`
+- 역할: 핵심 비즈니스 로직과 흐름 제어를 담당
+- 상세 설명:
+- 비즈니스 규칙을 한 곳에 모아 컨트롤러와 저장소 책임을 분리합니다.
+- 트랜잭션 경계, 예외 처리, 정책 선택 같은 핵심 흐름을 제어합니다.
+- 테스트 시 서비스 단위로 핵심 동작을 검증하기 쉬운 구조를 제공합니다.
+
+<details>
+<summary><code>PaymentWorkflowService.java</code> 전체 코드</summary>
+
+```java
+package com.goorm.springmissionsplayground.mission02_spring_core_basic.task02_circular_dependency.service;
+
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+
+@Service
+public class PaymentWorkflowService {
+
+    private final OrderWorkflowService orderWorkflowService;
+
+    public PaymentWorkflowService(@Lazy OrderWorkflowService orderWorkflowService) {
+        this.orderWorkflowService = orderWorkflowService;
+    }
+
+    public String prepare(String orderId) {
+        String orderState = orderWorkflowService.currentOrderState(orderId);
+        return "PAYMENT_READY -> " + orderState;
+    }
+}
+```
+
+</details>
+
+### 4.5 `CircularDependencyResolutionTest.java`
+
+- 파일 경로: `src/test/java/com/goorm/springmissionsplayground/mission02_spring_core_basic/task02_circular_dependency/CircularDependencyResolutionTest.java`
+- 역할: 핵심 동작을 자동 검증하는 테스트 코드
+- 상세 설명:
+- 요구사항을 테스트 시나리오로 고정해 회귀를 빠르게 감지합니다.
+- 핵심 분기(정상/예외)를 검증해 구현 의도를 보장합니다.
+
+<details>
+<summary><code>CircularDependencyResolutionTest.java</code> 전체 코드</summary>
+
+```java
+package com.goorm.springmissionsplayground.mission02_spring_core_basic.task02_circular_dependency;
+
+import com.goorm.springmissionsplayground.mission02_spring_core_basic.task02_circular_dependency.dto.CircularDependencyResponse;
+import com.goorm.springmissionsplayground.mission02_spring_core_basic.task02_circular_dependency.service.OrderWorkflowService;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.BeanCurrentlyInCreationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.stereotype.Component;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+@SpringBootTest
+class CircularDependencyResolutionTest {
+
+    @Autowired
+    private OrderWorkflowService orderWorkflowService;
+
+    @Test
+    void circularDependency_withConstructorInjectionOnly_fails() {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+        context.register(BrokenOrderService.class, BrokenPaymentService.class);
+
+        assertThatThrownBy(context::refresh)
+                .isInstanceOf(BeanCreationException.class)
+                .hasRootCauseInstanceOf(BeanCurrentlyInCreationException.class);
+
+        context.close();
+    }
+
+    @Test
+    void circularDependency_withLazyProxy_isResolved() {
+        CircularDependencyResponse response = orderWorkflowService.process("order-2002");
+
+        assertThat(response.getOrderId()).isEqualTo("order-2002");
+        assertThat(response.getOrderState()).isEqualTo("ORDER_READY(order-2002)");
+        assertThat(response.getPaymentState()).isEqualTo("PAYMENT_READY -> ORDER_READY(order-2002)");
+        assertThat(response.getResolution()).isEqualTo("생성자 주입 + @Lazy 프록시로 순환 의존성을 해소");
+    }
+
+    @Component
+    static class BrokenOrderService {
+        BrokenOrderService(BrokenPaymentService paymentService) {
+        }
+    }
+
+    @Component
+    static class BrokenPaymentService {
+        BrokenPaymentService(BrokenOrderService orderService) {
+        }
+    }
+}
+```
+
+</details>
+
+## 5. 새로 나온 개념 정리 + 참고 링크
+
+- **순환 의존성**: 빈 A와 B가 서로를 필요로 할 때 생성 순환 문제가 발생할 수 있습니다.  
+  공식 문서: https://docs.spring.io/spring-framework/reference/core/beans/dependencies/factory-collaborators.html
+- **지연 주입/구조 분리**: 책임 재배치로 순환을 끊고 단방향 의존으로 개선합니다.  
+  참고 문서: https://www.baeldung.com/circular-dependencies-in-spring
+
+## 6. 실행·빌드·테스트 방법
+
+애플리케이션 실행:
 
 ```bash
 ./gradlew bootRun
 ```
 
-### 3.2 API 호출 예시
+테스트 실행(태스크 범위):
 
 ```bash
-curl "http://localhost:8080/mission02/task02/circular-dependency/resolve?orderId=order-2002"
-```
-
-예상 응답:
-
-```json
-{
-  "orderId": "order-2002",
-  "orderState": "ORDER_READY(order-2002)",
-  "paymentState": "PAYMENT_READY -> ORDER_READY(order-2002)",
-  "resolution": "생성자 주입 + @Lazy 프록시로 순환 의존성을 해소"
-}
-```
-
-### 3.3 테스트 실행
-
-```bash
-./gradlew test --tests "*CircularDependencyResolutionTest"
+./gradlew test --tests "*task02_circular_dependency*"
 ```
 
 예상 결과:
-- 테스트 2건 성공
-- 순환 의존성 재현 테스트에서 컨텍스트 초기화 실패가 의도대로 검출됨
-- `@Lazy` 적용 구조에서 서비스 호출 결과 검증 성공
+- 태스크 관련 테스트가 모두 통과해야 합니다.
+- 실패 시 문서의 파일별 코드 블록과 테스트 코드를 함께 확인합니다.
 
-## 4. 결과 확인 방법
+## 7. 결과 확인 방법
 
-- `GET /mission02/task02/circular-dependency/resolve` 호출 시 JSON이 정상 응답되는지 확인
-- 테스트 리포트에서 `CircularDependencyResolutionTest` 두 케이스 성공 여부 확인
-- 실패 재현 테스트 로그에서 `BeanCurrentlyInCreationException` 관련 메시지 확인
+- 컨트롤러가 있는 태스크는 API 호출(curl/브라우저)로 응답 구조와 상태 코드를 확인합니다.
+- SQL 로그/애스펙트 로그/콘솔 출력이 필요한 태스크는 실행 로그를 함께 확인합니다.
+- 필요 시 실행 결과를 캡처해 태스크 문서 디렉토리에 PNG로 저장합니다.
 
-## 학습 내용
+## 8. 학습 내용
 
-- 순환 의존성은 두 개 이상의 빈이 서로를 직접 생성자 주입할 때 컨테이너가 어느 빈부터 완성해야 할지 결정하지 못해 초기화가 실패하는 문제입니다.
-- 생성자 주입은 의존성을 명확하게 강제하는 장점이 있지만, 구조가 잘못되면 순환 참조가 바로 드러납니다. 이 특성은 설계 문제를 초기에 발견하는 데 유리합니다.
-- `@Lazy`는 실제 객체 대신 프록시를 먼저 주입하고, 실제 빈 생성 시점을 뒤로 미뤄 순환 참조 초기화 충돌을 완화합니다.
-- 다만 `@Lazy`는 근본적으로 결합을 줄이는 방법은 아니므로, 장기적으로는 공통 책임 분리(중간 서비스 도입 등)로 순환 구조 자체를 제거하는 것이 더 바람직합니다.
+- 파일 경로 인덱스를 먼저 확인하면 전체 구조를 빠르게 파악할 수 있습니다.
+- 컨트롤러-서비스-저장소(또는 정책/도메인) 흐름을 분리하면 변경 지점을 명확히 관리할 수 있습니다.
+- 공식 문서를 기준으로 개념을 확인하면서 코드와 연결하면 실습 재현성이 높아집니다.
