@@ -1,0 +1,40 @@
+classDiagram
+    class EnrollmentService
+    class DiscountPolicy {
+        <<interface>>
+        +apply(int baseAmount) int
+    }
+    DiscountPolicy <|.. NewStudentDiscountPolicy
+    DiscountPolicy <|.. NoDiscountPolicy
+
+    class PaymentGateway {
+        <<interface>>
+        +pay(int amount) PaymentReceipt
+    }
+    PaymentGateway <|.. CardPaymentGateway
+    PaymentGateway <|.. VirtualAccountPaymentGateway
+
+    class NotificationChannel {
+        <<interface>>
+        +notify(String userId, String message)
+    }
+    NotificationChannel <|.. EmailNotificationChannel
+    NotificationChannel <|.. SmsNotificationChannel
+
+    class Course {
+        -id: String
+        -title: String
+        -tuition: int
+    }
+    class Enrollment {
+        -userId: String
+        -course: Course
+        -paidAmount: int
+        -transactionId: String
+    }
+
+    EnrollmentService --> DiscountPolicy
+    EnrollmentService --> PaymentGateway
+    EnrollmentService --> NotificationChannel
+    EnrollmentService --> Course
+    EnrollmentService --> Enrollment
