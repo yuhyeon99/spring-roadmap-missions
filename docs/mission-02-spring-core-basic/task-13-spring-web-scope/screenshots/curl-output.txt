@@ -1,0 +1,15 @@
+# 예시 실행 로그 (터미널 캡처 대체)
+$ curl -s http://localhost:8080/mission02/task13/scopes | jq
+{
+  "request": {
+    "requestId": "6d8e8c1e-8f4a-4c8e-9a1f-1234567890ab",
+    "createdAt": "2026-03-05T10:40:12.345"
+  },
+  "session": {
+    "sessionId": "session-4d0f7bd0-1234-43b1-9e5f-aaaabbbbcccc",
+    "itemCount": 0
+  },
+  "application": {
+    "totalHits": 1
+  }
+}
