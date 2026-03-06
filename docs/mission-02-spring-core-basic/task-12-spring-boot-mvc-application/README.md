@@ -618,9 +618,10 @@ class ArticleControllerTest {
   - 삭제: `curl -X DELETE http://localhost:8080/mission02/task12/articles/1`
 - 테스트: `./gradlew test --tests "*task12_spring_boot_mvc_application*"`
 
-## 7. 결과 확인 방법(스크린샷 포함)
+## 7. 결과 확인(스크린샷 포함)
 - 성공 기준: 위 테스트 명령이 통과하고, 실제 실행 시 생성→조회→삭제가 예상한 HTTP 상태 코드(201/200/204/404)로 동작하는지 curl로 확인.
 - 스크린샷은 요구되지 않는 태스크로, 필요 시 Postman/curl 결과 화면을 `docs/mission-02-spring-core-basic/task-12-spring-boot-mvc-application/` 하위에 추가해도 됩니다.
+- ![img.png](img.png)
 
 ## 8. 학습 내용
 - 컨트롤러는 입력/출력 계약만 담당하고, 서비스에 검증·정렬·예외 처리를 몰아주면 테스트와 유지보수가 쉬워진다.

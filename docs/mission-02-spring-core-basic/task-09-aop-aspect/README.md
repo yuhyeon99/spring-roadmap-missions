@@ -330,11 +330,11 @@ curl "http://localhost:8080/mission02/task09/aspect/demo?topic=AOP"
 ./gradlew test --tests "*task09_aop_aspect*"
 ```
 
-## 7. 결과 확인 방법
+## 7. 결과 확인
 
 - 문서의 호출 예시를 그대로 실행해 상태 코드/응답 본문을 확인합니다.
 - 테스트 명령으로 자동 검증 통과 여부를 함께 확인합니다.
-- 제출이 필요한 경우 실행 결과를 태스크 문서 디렉토리에 PNG로 저장합니다.
+![img.png](img.png)
 
 ## 8. 학습 내용
 

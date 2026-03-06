@@ -335,7 +335,7 @@ class OrderServiceTest {
 ## 7. 결과 확인 방법(스크린샷 포함)
 - 성공 기준: 주문 생성 시 ID가 발급되고, `/logs` 또는 `ExecutionLogStore`에 `placeOrder took ...ms` 형태 로그가 쌓인다.
 - 필요 시 curl 결과를 캡처해 `docs/mission-02-spring-core-basic/task-15-core-principles-demo/`에 저장하면 됩니다.
-
+![img.png](img.png)
 ## 8. 학습 내용
 - 인터페이스와 구현을 분리하면 컨테이너가 주입을 책임져 IoC/DI를 자연스럽게 달성할 수 있다.
 - AOP로 부가 기능을 외부화하면 핵심 로직을 더 간결하게 유지하면서도 실행 정보를 쉽게 수집할 수 있다.

@@ -373,6 +373,7 @@ class WebScopeControllerTest {
 - 성공 기준: 
   - 요청마다 `request.requestId` 값이 달라지고, 동일 세션에서 `session.itemCount`가 누적되며, `application.totalHits`가 전체 호출 수를 반영하면 성공.
   - `docs/mission-02-spring-core-basic/task-13-spring-web-scope/screenshots/curl-output.txt`에 예시 출력 로그를 제공했습니다. 실제 스크린샷을 촬영할 경우 같은 경로에 `request-session-application.png`로 저장하면 됩니다.
+![img.png](img.png)
 
 ## 8. 학습 내용
 - 스코프가 다른 빈을 하나의 컨트롤러에 주입할 때 프록시를 사용하면 라이프사이클 문제를 손쉽게 해결할 수 있다.

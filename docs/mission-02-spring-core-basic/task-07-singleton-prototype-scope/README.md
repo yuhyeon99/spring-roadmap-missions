@@ -472,10 +472,11 @@ curl http://localhost:8080/mission02/task07/scopes
 ./gradlew test --tests "*task07_singleton_prototype_scope*"
 ```
 
-## 7. 결과 확인 방법
+## 7. 결과 확인
 
 - `/mission02/task07/scopes`를 2회 호출해 스코프별 인스턴스 재사용 차이를 비교합니다.
 - 현재 문서 디렉토리의 스크린샷(`scope-run-result.png`)과 응답 값을 대조해 확인합니다.
+![scope-run-result.png](scope-run-result.png)
 
 ## 8. 학습 내용
 

@@ -320,6 +320,7 @@ class NotificationServiceTest {
 ## 7. 결과 확인 방법(스크린샷 포함)
 - 성공 기준: 지정한 채널에 따라 응답 `channel` 값이 일치하고, 미지원 채널 요청 시 400/500 범위 예외 메시지에 "지원하지 않는 채널"이 포함됩니다.
 - 스크린샷: 필요 시 curl 결과를 캡처해 `docs/mission-02-spring-core-basic/task-14-interface-injection/` 하위에 저장할 수 있습니다.
+![img.png](img.png)
 
 ## 8. 학습 내용
 - 동일 타입의 여러 빈을 Map/List로 주입하면 전략 패턴을 스프링 DI로 자연스럽게 구현할 수 있다.

@@ -637,9 +637,10 @@ class EnrollmentServiceTest {
 - Gradle 테스트(태스크 전용): `./gradlew test --tests "*task11_object_oriented_design_principles*"`
 - 다이어그램 확인: README의 Mermaid 블록 또는 `docs/mission-02-spring-core-basic/task-11-object-oriented-design-principles/solid-class-diagram.mmd` 파일을 Mermaid 뷰어에서 열기.
 
-## 7. 결과 확인 방법(스크린샷 포함)
+## 7. 결과 확인(스크린샷 포함)
 - 성공 기준: 위 테스트 명령이 모두 통과하고, README 내 Mermaid 다이어그램이 관계를 올바르게 표현하는지 확인.
 - 다이어그램 파일: `docs/mission-02-spring-core-basic/task-11-object-oriented-design-principles/solid-class-diagram.mmd` (필요 시 Mermaid Live Editor에서 렌더링). 별도 화면 캡처는 요구되지 않는 설계 태스크입니다.
+- ![img.png](img.png)
 
 ## 8. 학습 내용
 - 역할을 좁힌 인터페이스를 먼저 세운 후 구현을 뒤따르게 하면 자연스럽게 DIP와 ISP를 만족한다는 점을 체감했다.
