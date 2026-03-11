@@ -1,0 +1,17 @@
+flowchart TD
+    A["1. 브라우저 주소창에 URL 입력<br/>예: http://localhost:8080/mission03/task01/notes"] --> B["2. 브라우저가 URL 파싱<br/>scheme / host / port / path / query 분리"]
+    B --> C{"3. 캐시 또는 DNS 정보 존재?"}
+    C -- "예" --> D["IP 주소 확보"]
+    C -- "아니오" --> E["DNS 조회로 도메인을 IP 주소로 변환"]
+    E --> D
+    D --> F{"4. HTTPS 인가?"}
+    F -- "아니오" --> G["TCP 연결 수립<br/>3-way handshake"]
+    F -- "예" --> G
+    G --> H["5. HTTPS면 TLS handshake 수행<br/>인증서 검증 + 암호화 키 협상"]
+    H --> I["6. 브라우저가 HTTP 요청 메시지 생성<br/>Request Line + Headers + Body"]
+    I --> J["7. 서버(웹 서버/애플리케이션)가 요청 수신"]
+    J --> K["8. 라우팅 후 컨트롤러/핸들러 실행<br/>필요 시 서비스/DB 호출"]
+    K --> L["9. 서버가 HTTP 응답 메시지 생성<br/>Status Line + Headers + Body"]
+    L --> M["10. 브라우저가 응답 해석<br/>상태 코드, 헤더, 본문 처리"]
+    M --> N["11. HTML/CSS/JS/이미지 등 추가 리소스 요청 여부 판단"]
+    N --> O["12. 화면 렌더링 또는 데이터 표시"]

@@ -81,7 +81,7 @@ HTTP와 웹 통신의 기본 개념을 심층적으로 학습합니다.
 
 * [ ] 네트워크 계층 이해하기
 * [ ] URI의 구조 분석하기
-* [ ] HTTP 요청과 응답 흐름 이해하기
+* [x] **[HTTP 요청과 응답 흐름 이해하기](docs/mission-03-http-web-basic/task-02-http-request-response-flow/README.md)**
 * [x] **[HTTP 메서드별 특징 분석](docs/mission-03-http-web-basic/task-01-http-methods/README.md)**
 * [ ] HTTP 메서드의 실용적 활용
 * [ ] HTTP 상태 코드 심화 이해하기

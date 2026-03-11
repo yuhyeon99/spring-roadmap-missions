@@ -1,0 +1,11 @@
+GET /mission03/task01/notes HTTP/1.1
+Host: localhost:8080
+Accept: application/json
+User-Agent: Mozilla/5.0
+Connection: keep-alive
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 2
+
+[]
