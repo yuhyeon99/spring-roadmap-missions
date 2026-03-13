@@ -79,7 +79,7 @@ HTTP와 웹 통신의 기본 개념을 심층적으로 학습합니다.
 
 ### 하위 테스크
 
-* [ ] 네트워크 계층 이해하기
+* [x] **[네트워크 계층 이해하기](docs/mission-03-http-web-basic/task-10-network-layers/README.md)**
 * [ ] URI의 구조 분석하기
 * [x] **[HTTP 요청과 응답 흐름 이해하기](docs/mission-03-http-web-basic/task-02-http-request-response-flow/README.md)**
 * [x] **[HTTP 메서드별 특징 분석](docs/mission-03-http-web-basic/task-01-http-methods/README.md)**
