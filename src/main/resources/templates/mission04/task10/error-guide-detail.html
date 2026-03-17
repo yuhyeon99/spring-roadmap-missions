@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission04 Task10 - Error Guide Detail</title>
+    <style>
+        :root {
+            --ink: #172033;
+            --muted: #536071;
+            --line: rgba(23, 32, 51, 0.1);
+            --accent: #126a73;
+            --accent-soft: rgba(18, 106, 115, 0.12);
+            --bg-a: #f4f1ea;
+            --bg-b: #d5eced;
+            --card: rgba(255, 255, 255, 0.9);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Pretendard", "Noto Sans KR", sans-serif;
+            color: var(--ink);
+            background:
+                linear-gradient(145deg, var(--bg-a), var(--bg-b));
+        }
+
+        main {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 48px 20px 64px;
+        }
+
+        .sheet {
+            padding: 34px;
+            border-radius: 28px;
+            border: 1px solid var(--line);
+            background: var(--card);
+            box-shadow: 0 24px 56px rgba(23, 32, 51, 0.1);
+        }
+
+        .meta {
+            display: inline-flex;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        h1 {
+            margin: 18px 0 20px;
+            font-size: clamp(2rem, 4vw, 3rem);
+            line-height: 1.15;
+        }
+
+        p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.8;
+        }
+
+        .section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--line);
+        }
+
+        .related-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .related-list a,
+        .back-link {
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .related-card {
+            padding: 16px;
+            border-radius: 18px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.74);
+        }
+
+        .back-link {
+            display: inline-flex;
+            margin-top: 24px;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <section class="sheet">
+        <span class="meta" th:text="|Guide #${guide.id}|">Guide #1</span>
+        <h1 th:text="${guide.title}">가이드 제목</h1>
+        <p th:text="${guide.summary}">가이드 설명</p>
+
+        <div class="section">
+            <strong>권장 안내 방식</strong>
+            <p th:text="${guide.recommendedAction}">권장 액션</p>
+        </div>
+
+        <div class="section">
+            <strong>다른 안내 페이지</strong>
+            <div class="related-list">
+                <div class="related-card" th:each="related : ${relatedGuides}">
+                    <a th:href="@{/mission04/task10/error-guides/{id}(id=${related.id})}" th:text="${related.title}">다른 가이드</a>
+                </div>
+            </div>
+        </div>
+
+        <a class="back-link" th:href="@{/mission04/task10/error-guides}">목록으로 돌아가기</a>
+    </section>
+</main>
+</body>
+</html>
