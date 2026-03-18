@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission04 Task02 - View Resolver</title>
+    <style>
+        :root {
+            --bg: linear-gradient(135deg, #f3efe4, #dce7f2);
+            --card: rgba(255, 255, 255, 0.92);
+            --ink: #203040;
+            --subtle: #5f6f7f;
+            --accent: #b45309;
+            --accent-soft: #fde6c8;
+            --line: #d7dde5;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 28px;
+            font-family: "SUIT", "Pretendard", "Noto Sans KR", sans-serif;
+            color: var(--ink);
+            background: var(--bg);
+        }
+
+        .page {
+            width: min(960px, 100%);
+            margin: 0 auto;
+            display: grid;
+            gap: 20px;
+        }
+
+        .hero,
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            box-shadow: 0 18px 40px rgba(32, 48, 64, 0.08);
+        }
+
+        .hero {
+            padding: 32px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 7px 14px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        h1,
+        h2 {
+            margin: 0;
+        }
+
+        h1 {
+            margin-top: 14px;
+            font-size: clamp(1.9rem, 4vw, 2.6rem);
+        }
+
+        .summary {
+            margin: 14px 0 0;
+            color: var(--subtle);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .meta {
+            margin-top: 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            color: var(--subtle);
+            font-size: 0.95rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 20px;
+        }
+
+        .panel {
+            padding: 24px;
+        }
+
+        .panel-title {
+            margin-bottom: 16px;
+            font-size: 1.15rem;
+        }
+
+        .flow-list,
+        .example-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .flow-item,
+        .example-item {
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 16px;
+            background: #ffffff;
+        }
+
+        .flow-item strong,
+        .example-item strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .path-box {
+            margin-top: 14px;
+            padding: 16px;
+            border-radius: 18px;
+            background: #1f2937;
+            color: #f9fafb;
+            font-family: "JetBrains Mono", "D2Coding", monospace;
+            overflow-x: auto;
+        }
+
+        .caption {
+            margin: 0 0 8px;
+            color: var(--subtle);
+            font-size: 0.92rem;
+        }
+
+        @media (max-width: 780px) {
+            body {
+                padding: 18px;
+            }
+
+            .hero,
+            .panel {
+                padding: 20px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<main class="page">
+    <section class="hero">
+        <span class="badge">Mission04 Task02</span>
+        <h1 th:text="${pageTitle}">View Resolver 설정과 활용</h1>
+        <p class="summary" th:text="${welcomeMessage}">
+            MVC 학습자님, 컨트롤러가 반환한 논리 뷰 이름을 View Resolver가 실제 템플릿으로 연결합니다.
+        </p>
+        <div class="meta">
+            <span>템플릿 엔진: <strong th:text="${templateEngine}">Thymeleaf</strong></span>
+            <span>렌더링 시각: <strong th:text="${renderedAt}">2026-03-18 20:10:00</strong></span>
+        </div>
+        <p class="caption">View Resolver가 선택한 뷰</p>
+        <div class="path-box" th:text="${logicalViewName}">mission04/task02/view-resolver-demo</div>
+    </section>
+
+    <section class="grid">
+        <article class="panel">
+            <h2 class="panel-title">View Resolver 동작 흐름</h2>
+            <div class="flow-list">
+                <div class="flow-item" th:each="item : ${resolverFlow}">
+                    <strong th:text="${item.stage}">1. Controller 반환</strong>
+                    <span th:text="${item.description}">논리 뷰 이름 반환</span>
+                </div>
+            </div>
+        </article>
+
+        <article class="panel">
+            <h2 class="panel-title">Model 데이터 출력 예제</h2>
+            <div class="example-list">
+                <div class="example-item">
+                    <strong>displayName</strong>
+                    <span th:text="${displayName}">MVC 학습자</span>
+                </div>
+                <div class="example-item" th:each="example : ${modelExamples}">
+                    <strong th:text="${example}">displayName = MVC 학습자</strong>
+                </div>
+            </div>
+
+            <p class="caption">View Resolver가 prefix/suffix를 적용한 템플릿 위치</p>
+            <div class="path-box" th:text="${resolvedTemplatePath}">
+                classpath:/templates/mission04/task02/view-resolver-demo.html
+            </div>
+        </article>
+    </section>
+</main>
+</body>
+</html>
