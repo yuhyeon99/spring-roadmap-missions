@@ -109,7 +109,7 @@ HTTP와 웹 통신의 기본 개념을 심층적으로 학습합니다.
 * [x] **[View Resolver 설정과 활용](docs/mission-04-spring-mvc/task-02-view-resolver/README.md)**
 * [ ] 뷰 템플릿을 사용한 데이터 출력
 * [ ] 타입 변환기를 통한 사용자 입력 데이터 변환
-* [ ] 검증 애노테이션 사용
+* [x] **[검증 애노테이션 사용](docs/mission-04-spring-mvc/task-03-validation-annotations/README.md)**
 * [ ] 메시지 소스를 통한 다국어 지원 설정
 * [x] **[예외 처리와 사용자 알림](docs/mission-04-spring-mvc/task-10-exception-handling-user-notification/README.md)**
 * [ ] 필터와 인터셉터를 통한 요청 로깅

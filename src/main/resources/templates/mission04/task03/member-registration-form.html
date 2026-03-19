@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission04 Task03 - Validation Annotations</title>
+    <style>
+        :root {
+            --ink: #153243;
+            --muted: #5d7280;
+            --paper: rgba(255, 255, 255, 0.92);
+            --line: rgba(21, 50, 67, 0.14);
+            --accent: #1f7a8c;
+            --accent-soft: rgba(31, 122, 140, 0.12);
+            --danger: #b42318;
+            --danger-soft: rgba(180, 35, 24, 0.08);
+            --bg-a: #f4efe7;
+            --bg-b: #d4e8ed;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Pretendard", "SUIT", "Noto Sans KR", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top left, rgba(31, 122, 140, 0.16), transparent 28%),
+                linear-gradient(140deg, var(--bg-a), var(--bg-b));
+        }
+
+        main {
+            width: min(1120px, 100%);
+            margin: 0 auto;
+            padding: 36px 20px 56px;
+            display: grid;
+            gap: 22px;
+        }
+
+        .hero,
+        .sheet,
+        .panel {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 26px;
+            box-shadow: 0 20px 48px rgba(21, 50, 67, 0.08);
+        }
+
+        .hero,
+        .sheet,
+        .panel {
+            padding: 28px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 0.92rem;
+            font-weight: 800;
+        }
+
+        h1,
+        h2,
+        p {
+            margin: 0;
+        }
+
+        h1 {
+            margin-top: 16px;
+            font-size: clamp(2rem, 4vw, 3.3rem);
+            line-height: 1.1;
+        }
+
+        .hero p {
+            margin-top: 14px;
+            color: var(--muted);
+            line-height: 1.75;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1.25fr 0.75fr;
+            gap: 22px;
+        }
+
+        form {
+            display: grid;
+            gap: 18px;
+        }
+
+        .field-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .field {
+            display: grid;
+            gap: 8px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 700;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #c6d4db;
+            border-radius: 16px;
+            background: #fff;
+            color: var(--ink);
+            font: inherit;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: 2px solid rgba(31, 122, 140, 0.2);
+            border-color: var(--accent);
+        }
+
+        .hint {
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .error-summary,
+        .field-error {
+            color: var(--danger);
+        }
+
+        .error-summary {
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: var(--danger-soft);
+            border: 1px solid rgba(180, 35, 24, 0.16);
+            font-weight: 700;
+        }
+
+        .field-error {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        button,
+        .ghost-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 0 18px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 800;
+            font: inherit;
+        }
+
+        button {
+            border: none;
+            background: var(--ink);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .ghost-link {
+            border: 1px solid var(--line);
+            color: var(--ink);
+            background: #fff;
+        }
+
+        .rule-list,
+        .track-list {
+            display: grid;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .rule-item,
+        .track-item {
+            padding: 16px;
+            border-radius: 18px;
+            border: 1px solid var(--line);
+            background: #fff;
+        }
+
+        .track-item strong,
+        .rule-item strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .inline-code {
+            margin-top: 18px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: #11212b;
+            color: #f8fafc;
+            font-family: "JetBrains Mono", "D2Coding", monospace;
+            overflow-x: auto;
+        }
+
+        @media (max-width: 900px) {
+            .layout,
+            .field-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<main>
+    <section class="hero">
+        <span class="eyebrow">Mission04 Task03</span>
+        <h1 th:text="${pageTitle}">검증 애노테이션으로 회원 가입 폼 검증</h1>
+        <p th:text="${pageDescription}">
+            폼 입력값을 DTO에 바인딩한 뒤 @NotNull, @Size 같은 검증 애노테이션으로 필수값과 길이 조건을 확인합니다.
+        </p>
+        <div class="inline-code">POST /mission04/task03/members/new</div>
+    </section>
+
+    <section class="layout">
+        <article class="sheet">
+            <form th:action="${formAction}" th:object="${memberRegistrationForm}" method="post">
+                <div class="error-summary" th:if="${#fields.hasAnyErrors()}" th:text="${submissionStatus}">
+                    입력값을 다시 확인해 주세요.
+                </div>
+
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="name">이름</label>
+                        <input id="name" type="text" th:field="*{name}" placeholder="예: 김스프링">
+                        <span class="hint">`@NotBlank`, `@Size(min=2, max=20)`</span>
+                        <span class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">이름 오류</span>
+                    </div>
+
+                    <div class="field">
+                        <label for="email">이메일</label>
+                        <input id="email" type="email" th:field="*{email}" placeholder="spring@example.com">
+                        <span class="hint">`@NotBlank`, `@Email`, `@Size(max=60)`</span>
+                        <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">이메일 오류</span>
+                    </div>
+
+                    <div class="field">
+                        <label for="age">나이</label>
+                        <input id="age" type="number" th:field="*{age}" placeholder="23">
+                        <span class="hint">`@NotNull`, `@Min(14)`, `@Max(120)`</span>
+                        <span class="field-error" th:if="${#fields.hasErrors('age')}" th:errors="*{age}">나이 오류</span>
+                    </div>
+
+                    <div class="field">
+                        <label for="password">비밀번호</label>
+                        <input id="password" type="password" th:field="*{password}" placeholder="8자 이상 입력">
+                        <span class="hint">`@NotBlank`, `@Size(min=8, max=20)`</span>
+                        <span class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">비밀번호 오류</span>
+                    </div>
+
+                    <div class="field full">
+                        <label for="studyTrack">학습 트랙</label>
+                        <select id="studyTrack" th:field="*{studyTrack}">
+                            <option value="">선택해 주세요</option>
+                            <option th:each="track : ${studyTrackOptions}"
+                                    th:value="${track.code}"
+                                    th:text="${track.label}">
+                                Spring MVC
+                            </option>
+                        </select>
+                        <span class="hint">`@NotBlank`로 선택 여부를 검증합니다.</span>
+                        <span class="field-error" th:if="${#fields.hasErrors('studyTrack')}" th:errors="*{studyTrack}">학습 트랙 오류</span>
+                    </div>
+
+                    <div class="field full">
+                        <label for="introduction">자기소개</label>
+                        <textarea id="introduction" th:field="*{introduction}" placeholder="선택 입력, 120자 이하"></textarea>
+                        <span class="hint">`@Size(max=120)`로 최대 길이를 제한합니다.</span>
+                        <span class="field-error" th:if="${#fields.hasErrors('introduction')}" th:errors="*{introduction}">자기소개 오류</span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button type="submit">회원 가입 검증 실행</button>
+                    <a class="ghost-link" th:href="@{/mission04/task03/members/new}">폼 초기화</a>
+                </div>
+            </form>
+        </article>
+
+        <aside class="panel">
+            <h2>이 폼에서 확인하는 검증 규칙</h2>
+            <div class="rule-list">
+                <div class="rule-item" th:each="rule : ${validationRules}">
+                    <strong th:text="${rule}">@NotBlank: 비어 있지 않은 문자열 검증</strong>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 24px;">학습 트랙 안내</h2>
+            <div class="track-list">
+                <div class="track-item" th:each="track : ${studyTrackOptions}">
+                    <strong th:text="${track.label}">Spring MVC</strong>
+                    <span th:text="${track.description}">설명</span>
+                </div>
+            </div>
+        </aside>
+    </section>
+</main>
+</body>
+</html>
