@@ -103,7 +103,7 @@ HTTP와 웹 통신의 기본 개념을 심층적으로 학습합니다.
 ### 하위 테스크
 
 * [x] **[스프링 MVC의 요청-응답 흐름 이해](docs/mission-04-spring-mvc/task-04-request-response-flow/README.md)**
-* [ ] DispatcherServlet의 동작 방식 요약
+* [x] **[DispatcherServlet의 동작 방식 요약](docs/mission-04-spring-mvc/task-08-dispatcher-servlet-summary/README.md)**
 * [x] **[애노테이션을 통한 요청 매핑](docs/mission-04-spring-mvc/task-05-request-mapping-annotations/README.md)**
 * [ ] Model과 View 분리하기
 * [x] **[View Resolver 설정과 활용](docs/mission-04-spring-mvc/task-02-view-resolver/README.md)**

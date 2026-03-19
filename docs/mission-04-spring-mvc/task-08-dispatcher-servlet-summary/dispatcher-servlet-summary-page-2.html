@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DispatcherServlet Summary Page 2</title>
+    <style>
+        :root {
+            --ink: #17283e;
+            --muted: #5c6a7a;
+            --line: #d8dfe6;
+            --accent: #0f766e;
+            --accent-soft: #d8f0ec;
+            --bg: linear-gradient(145deg, #eef4ef, #dbe7ef);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 24px;
+            font-family: "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
+            color: var(--ink);
+            background: var(--bg);
+        }
+
+        .page {
+            width: 1120px;
+            min-height: 1580px;
+            margin: 0 auto;
+            padding: 40px;
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 22px 60px rgba(23, 40, 62, 0.12);
+        }
+
+        .eyebrow {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        h1, h2, h3, p {
+            margin: 0;
+        }
+
+        h1 {
+            margin-top: 18px;
+            font-size: 46px;
+            line-height: 1.15;
+        }
+
+        .lead {
+            margin-top: 18px;
+            color: var(--muted);
+            font-size: 23px;
+            line-height: 1.7;
+        }
+
+        .section {
+            margin-top: 32px;
+        }
+
+        .section-title {
+            margin-bottom: 16px;
+            font-size: 29px;
+        }
+
+        .steps {
+            display: grid;
+            gap: 14px;
+        }
+
+        .step {
+            padding: 20px 22px;
+            border-radius: 22px;
+            border: 1px solid var(--line);
+            background: #fff;
+        }
+
+        .step strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 24px;
+        }
+
+        .step p, .table td, .table th, .note {
+            color: var(--muted);
+            font-size: 20px;
+            line-height: 1.7;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 22px;
+            border-style: hidden;
+            box-shadow: 0 0 0 1px var(--line);
+            background: #fff;
+        }
+
+        .table th, .table td {
+            padding: 16px 18px;
+            border: 1px solid var(--line);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .table th {
+            color: var(--ink);
+            background: #f7fafb;
+            font-size: 20px;
+        }
+
+        .note {
+            margin-top: 18px;
+            padding: 18px 20px;
+            border-radius: 20px;
+            background: #162435;
+            color: #f8fafc;
+        }
+    </style>
+</head>
+<body>
+<section class="page">
+    <span class="eyebrow">Mission04 Task08</span>
+    <h1>요청 처리부터 응답 반환까지</h1>
+    <p class="lead">
+        DispatcherServlet은 요청이 들어오면 매핑 조회, 어댑터 선택, 컨트롤러 실행,
+        예외 처리, 뷰 렌더링 또는 응답 본문 작성까지를 순서대로 조정합니다.
+    </p>
+
+    <div class="section">
+        <h2 class="section-title">1. 요청 처리 단계</h2>
+        <div class="steps">
+            <div class="step">
+                <strong>1) HandlerMapping 조회</strong>
+                <p>URL, HTTP 메서드, 애노테이션 조건을 바탕으로 어떤 핸들러가 현재 요청을 처리할지 찾습니다.</p>
+            </div>
+            <div class="step">
+                <strong>2) HandlerAdapter 선택</strong>
+                <p>찾은 핸들러를 실제로 실행할 수 있는 어댑터를 선택해, 컨트롤러 메서드 인자 준비와 호출 방식을 맞춥니다.</p>
+            </div>
+            <div class="step">
+                <strong>3) 컨트롤러 실행</strong>
+                <p>컨트롤러는 비즈니스 로직을 호출하고 ModelAndView, 논리 뷰 이름, ResponseEntity, JSON 본문 같은 결과를 반환합니다.</p>
+            </div>
+            <div class="step">
+                <strong>4) 예외 처리 분기</strong>
+                <p>실행 중 예외가 발생하면 HandlerExceptionResolver 또는 @ExceptionHandler, @ControllerAdvice 흐름으로 연결됩니다.</p>
+            </div>
+            <div class="step">
+                <strong>5) ViewResolver 또는 메시지 컨버터</strong>
+                <p>HTML 화면이면 ViewResolver가 논리 뷰 이름을 실제 View로 바꾸고, REST 응답이면 HttpMessageConverter가 본문을 바로 작성합니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">2. 주요 전략 객체 역할</h2>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>컴포넌트</th>
+                <th>DispatcherServlet과의 관계</th>
+                <th>왜 필요한가</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>HandlerMapping</td>
+                <td>요청을 어떤 핸들러로 보낼지 찾는다</td>
+                <td>라우팅 규칙을 DispatcherServlet 바깥으로 분리한다</td>
+            </tr>
+            <tr>
+                <td>HandlerAdapter</td>
+                <td>선택된 핸들러를 실제로 실행한다</td>
+                <td>컨트롤러 종류가 달라도 같은 흐름으로 처리할 수 있다</td>
+            </tr>
+            <tr>
+                <td>HandlerExceptionResolver</td>
+                <td>예외를 HTTP 응답이나 오류 화면으로 바꾼다</td>
+                <td>컨트롤러마다 try-catch를 반복하지 않게 한다</td>
+            </tr>
+            <tr>
+                <td>ViewResolver</td>
+                <td>논리 뷰 이름을 실제 View로 해석한다</td>
+                <td>컨트롤러가 템플릿 경로를 직접 알 필요가 없다</td>
+            </tr>
+            <tr>
+                <td>HttpMessageConverter</td>
+                <td>객체를 JSON/XML/문자열 응답으로 직렬화한다</td>
+                <td>REST API 응답을 뷰 없이 바로 만들 수 있다</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">3. 정리 포인트</h2>
+        <div class="steps">
+            <div class="step">
+                <strong>초기화 관점</strong>
+                <p>DispatcherServlet은 시작 시점에 MVC 전략 객체를 준비해 요청이 들어왔을 때 즉시 사용할 수 있는 상태가 됩니다.</p>
+            </div>
+            <div class="step">
+                <strong>요청 처리 관점</strong>
+                <p>DispatcherServlet은 직접 비즈니스 로직을 수행하지 않고, 적절한 전략 객체를 선택하고 호출 순서를 조정합니다.</p>
+            </div>
+            <div class="step">
+                <strong>응답 관점</strong>
+                <p>결과가 화면이면 뷰 렌더링으로, API면 메시지 컨버터로 분기해 최종 HTTP 응답을 완성합니다.</p>
+            </div>
+        </div>
+        <div class="note">
+            한 줄 요약: DispatcherServlet은 스프링 MVC 요청 처리의 "중앙 관제실"입니다.
+            초기화 단계에서 전략 객체를 준비하고, 런타임에는 요청을 적절한 컨트롤러와 응답 방식으로 연결합니다.
+        </div>
+    </div>
+</section>
+</body>
+</html>

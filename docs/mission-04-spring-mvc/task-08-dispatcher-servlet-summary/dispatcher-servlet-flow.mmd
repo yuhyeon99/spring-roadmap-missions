@@ -1,0 +1,12 @@
+flowchart TD
+    A["1. DispatcherServlet 초기화<br/>FrameworkServlet 초기화 후 WebApplicationContext 준비"] --> B["2. 전략 객체 탐색<br/>HandlerMapping, HandlerAdapter, ViewResolver, HandlerExceptionResolver 등"]
+    B --> C["3. 클라이언트 요청 수신<br/>HttpServletRequest / HttpServletResponse 전달"]
+    C --> D["4. HandlerMapping 조회<br/>요청을 처리할 핸들러 탐색"]
+    D --> E["5. HandlerAdapter 선택<br/>핸들러 실행 방식 결정"]
+    E --> F["6. 컨트롤러 실행<br/>ModelAndView 또는 응답 본문 생성"]
+    F --> G{"7. View 렌더링 필요?"}
+    G -- "예" --> H["8. ViewResolver로 논리 뷰 이름 해석"]
+    H --> I["9. View 렌더링<br/>Model 데이터를 화면에 반영"]
+    G -- "아니오" --> J["8. HttpMessageConverter 등으로 바로 응답 생성"]
+    I --> K["10. DispatcherServlet이 최종 HTTP 응답 반환"]
+    J --> K
