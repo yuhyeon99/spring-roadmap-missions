@@ -112,7 +112,7 @@ HTTP와 웹 통신의 기본 개념을 심층적으로 학습합니다.
 * [x] **[검증 애노테이션 사용](docs/mission-04-spring-mvc/task-03-validation-annotations/README.md)**
 * [x] **[메시지 소스를 통한 다국어 지원 설정](docs/mission-04-spring-mvc/task-07-message-source/README.md)**
 * [x] **[예외 처리와 사용자 알림](docs/mission-04-spring-mvc/task-10-exception-handling-user-notification/README.md)**
-* [ ] 필터와 인터셉터를 통한 요청 로깅
+* [x] **[필터와 인터셉터를 통한 요청 로깅](docs/mission-04-spring-mvc/task-09-request-logging-filter-interceptor/README.md)**
 
 </details>
 
