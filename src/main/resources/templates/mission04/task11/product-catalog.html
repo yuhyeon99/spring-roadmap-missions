@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">뷰 템플릿으로 출력하는 제품 목록</title>
+    <style>
+        :root {
+            --ink: #1f2937;
+            --muted: #6b7280;
+            --line: #d7dee7;
+            --surface: rgba(255, 255, 255, 0.88);
+            --surface-strong: #ffffff;
+            --accent: #0f766e;
+            --accent-soft: #d9f3ef;
+            --warn: #b45309;
+            --warn-soft: #fff1d6;
+            --bg: linear-gradient(135deg, #eef6ff 0%, #f8f3ea 52%, #f4fbf9 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+            color: var(--ink);
+            background: var(--bg);
+        }
+
+        .page {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 48px 20px 80px;
+        }
+
+        .hero {
+            padding: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            border-radius: 28px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(247, 251, 255, 0.82));
+            box-shadow: 0 18px 45px rgba(31, 41, 55, 0.08);
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        h1, h2, p {
+            margin: 0;
+        }
+
+        h1 {
+            margin-top: 18px;
+            font-size: clamp(2rem, 4vw, 3.6rem);
+            line-height: 1.08;
+        }
+
+        .hero p {
+            margin-top: 16px;
+            max-width: 700px;
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        .filter-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        .filter-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: var(--surface-strong);
+            color: var(--ink);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .filter-link.active {
+            border-color: transparent;
+            background: var(--ink);
+            color: #ffffff;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-top: 28px;
+        }
+
+        .summary-card {
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.82);
+            border-radius: 22px;
+            background: var(--surface);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+        }
+
+        .summary-label {
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .summary-value {
+            margin-top: 10px;
+            font-size: 1.9rem;
+            font-weight: 800;
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 16px;
+            margin-top: 36px;
+        }
+
+        .section-head p {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.82);
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+        }
+
+        .card-top,
+        .card-bottom {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .category-pill,
+        .status-pill,
+        .featured-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .category-pill {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .status-pill.stock-ok {
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        .status-pill.stock-low {
+            background: var(--warn-soft);
+            color: var(--warn);
+        }
+
+        .featured-pill {
+            background: #fce7f3;
+            color: #be185d;
+        }
+
+        .product-name {
+            font-size: 1.25rem;
+            line-height: 1.35;
+        }
+
+        .product-summary {
+            color: var(--muted);
+            line-height: 1.7;
+            min-height: 88px;
+        }
+
+        .price {
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .stock-text {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .empty-state {
+            margin-top: 20px;
+            padding: 28px;
+            border: 1px dashed var(--line);
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.72);
+            color: var(--muted);
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        .footer-note {
+            margin-top: 18px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .page {
+                padding-top: 28px;
+            }
+
+            .hero,
+            .summary-card,
+            .product-card {
+                border-radius: 20px;
+            }
+
+            .section-head,
+            .card-top,
+            .card-bottom {
+                flex-direction: column;
+                align-items: start;
+            }
+        }
+    </style>
+</head>
+<body>
+<main class="page">
+    <section class="hero">
+        <span class="eyebrow">Mission 04 Task 11</span>
+        <h1 th:text="${pageTitle}">뷰 템플릿으로 출력하는 제품 목록</h1>
+        <p>
+            컨트롤러가 `Model`에 담은 제품 목록을 Thymeleaf가 반복문으로 렌더링합니다.
+            현재 선택된 분류는 <strong th:text="${selectedCategoryLabel}">전체</strong>이며,
+            각 카드에는 이름, 분류, 가격, 재고 상태가 동적으로 출력됩니다.
+        </p>
+
+        <div class="filter-list">
+            <a class="filter-link"
+               th:classappend="${selectedCategory == 'all'} ? ' active'"
+               th:href="@{/mission04/task11/products}">
+                전체
+            </a>
+            <a class="filter-link"
+               th:classappend="${selectedCategory == 'mvc'} ? ' active'"
+               th:href="@{/mission04/task11/products(category='mvc')}">
+                Spring MVC
+            </a>
+            <a class="filter-link"
+               th:classappend="${selectedCategory == 'cloud'} ? ' active'"
+               th:href="@{/mission04/task11/products(category='cloud')}">
+                Cloud
+            </a>
+            <a class="filter-link"
+               th:classappend="${selectedCategory == 'data'} ? ' active'"
+               th:href="@{/mission04/task11/products(category='data')}">
+                Data
+            </a>
+        </div>
+
+        <div class="summary-grid">
+            <article class="summary-card">
+                <div class="summary-label">현재 화면 제품 수</div>
+                <div class="summary-value" th:text="${totalCount}">5</div>
+            </article>
+            <article class="summary-card">
+                <div class="summary-label">추천 상품 수</div>
+                <div class="summary-value" th:text="${featuredCount}">2</div>
+            </article>
+            <article class="summary-card">
+                <div class="summary-label">재고 확인 필요</div>
+                <div class="summary-value" th:text="${lowStockCount}">2</div>
+            </article>
+            <article class="summary-card">
+                <div class="summary-label">렌더링 시각</div>
+                <div class="summary-value" th:text="${renderedAt}">2026-03-20 15:30:00</div>
+            </article>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-head">
+            <div>
+                <h2>제품 목록</h2>
+                <p th:text="|선택된 분류: ${selectedCategoryLabel}|">선택된 분류: 전체</p>
+            </div>
+            <p>템플릿 반복문은 `th:each="product : ${products}"`로 구성했습니다.</p>
+        </div>
+
+        <div class="product-grid" th:if="${!products.isEmpty()}">
+            <article class="product-card" th:each="product : ${products}">
+                <div class="card-top">
+                    <span class="category-pill" th:text="${product.categoryLabel}">Spring MVC</span>
+                    <span class="featured-pill" th:if="${product.featured}">추천</span>
+                </div>
+
+                <div>
+                    <h3 class="product-name" th:text="${product.name}">스프링 MVC 핸드북</h3>
+                    <p class="product-summary" th:text="${product.summary}">
+                        DispatcherServlet, 요청 매핑, 검증 흐름을 한 권에 정리한 입문용 자료입니다.
+                    </p>
+                </div>
+
+                <div class="card-bottom">
+                    <div>
+                        <div class="price" th:text="${product.formattedPrice}">28,000원</div>
+                        <div class="stock-text" th:text="|남은 수량 ${product.stockQuantity}개|">남은 수량 12개</div>
+                    </div>
+                    <span class="status-pill"
+                          th:classappend="${product.lowStock} ? ' stock-low' : ' stock-ok'"
+                          th:text="${product.stockStatusText}">
+                        즉시 구매 가능
+                    </span>
+                </div>
+            </article>
+        </div>
+
+        <div class="empty-state" th:if="${products.isEmpty()}">
+            조건에 맞는 제품이 없습니다. 다른 분류를 선택해 다시 확인해 보세요.
+        </div>
+
+        <p class="footer-note">
+            이 화면은 정적 HTML이 아니라, 서버에서 전달한 `products` 컬렉션 길이에 따라 카드 수가 달라집니다.
+        </p>
+    </section>
+</main>
+</body>
+</html>

@@ -107,7 +107,7 @@ HTTP와 웹 통신의 기본 개념을 심층적으로 학습합니다.
 * [x] **[애노테이션을 통한 요청 매핑](docs/mission-04-spring-mvc/task-05-request-mapping-annotations/README.md)**
 * [ ] Model과 View 분리하기
 * [x] **[View Resolver 설정과 활용](docs/mission-04-spring-mvc/task-02-view-resolver/README.md)**
-* [ ] 뷰 템플릿을 사용한 데이터 출력
+* [x] **[뷰 템플릿을 사용한 데이터 출력](docs/mission-04-spring-mvc/task-11-view-template-data-output/README.md)**
 * [x] **[타입 변환기를 통한 사용자 입력 데이터 변환](docs/mission-04-spring-mvc/task-06-type-converter/README.md)**
 * [x] **[검증 애노테이션 사용](docs/mission-04-spring-mvc/task-03-validation-annotations/README.md)**
 * [x] **[메시지 소스를 통한 다국어 지원 설정](docs/mission-04-spring-mvc/task-07-message-source/README.md)**
