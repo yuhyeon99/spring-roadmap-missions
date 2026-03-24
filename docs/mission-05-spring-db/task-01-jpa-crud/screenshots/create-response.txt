@@ -1,0 +1,7 @@
+HTTP/1.1 201 
+Location: /mission05/task01/members/1
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Tue, 24 Mar 2026 14:12:57 GMT
+
+{"id":1,"name":"미션오회원","email":"mission05@example.com"}
