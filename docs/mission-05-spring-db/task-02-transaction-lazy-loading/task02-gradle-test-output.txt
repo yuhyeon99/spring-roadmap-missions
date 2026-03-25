@@ -1,0 +1,23 @@
+> Task :compileJava
+> Task :processResources UP-TO-DATE
+> Task :classes
+> Task :compileTestJava UP-TO-DATE
+> Task :processTestResources NO-SOURCE
+> Task :testClasses UP-TO-DATE
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-03-25T23:43:13.107+09:00  INFO 11591 --- [core] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+Hibernate: 
+    drop table if exists members cascade 
+Hibernate: 
+    drop table if exists mission05_task01_members cascade 
+Hibernate: 
+    drop table if exists mission05_task02_members cascade 
+Hibernate: 
+    drop table if exists mission05_task02_teams cascade 
+2026-03-25T23:43:13.110+09:00  INFO 11591 --- [core] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-03-25T23:43:13.111+09:00  INFO 11591 --- [core] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+> Task :test
+
+BUILD SUCCESSFUL in 4s
+4 actionable tasks: 2 executed, 2 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.3.0/userguide/configuration_cache_enabling.html
