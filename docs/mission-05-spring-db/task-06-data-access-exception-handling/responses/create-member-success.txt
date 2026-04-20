@@ -1,0 +1,7 @@
+HTTP/1.1 201 
+Location: /mission05/task06/members/1
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Mon, 20 Apr 2026 13:51:16 GMT
+
+{"id":1,"name":"예외처리회원","email":"task06@example.com","grade":"BASIC"}
