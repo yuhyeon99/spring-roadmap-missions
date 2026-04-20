@@ -1,0 +1,6 @@
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Mon, 20 Apr 2026 08:38:10 GMT
+
+[{"category":"BOOK","id":1,"name":"백엔드 핸드북","price":28000,"stockQuantity":20}]

@@ -1,0 +1,7 @@
+HTTP/1.1 201 
+Location: /mission05/task05/products/1
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Mon, 20 Apr 2026 08:38:08 GMT
+
+{"writeTechnology":"JPA","readTechnology":"MyBatis","savedByJpa":{"id":1,"name":"백엔드 핸드북","category":"BOOK","price":28000,"stockQuantity":12},"readByMyBatis":{"category":"BOOK","id":1,"name":"백엔드 핸드북","price":28000,"stockQuantity":12},"categoryStockSummaries":[{"category":"BOOK","productCount":1,"totalStockQuantity":12}]}
