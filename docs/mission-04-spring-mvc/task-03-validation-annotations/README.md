@@ -1122,7 +1122,7 @@ curl -i -X POST http://localhost:8080/mission04/task03/members/new \
 - 예상 결과:
   - 테스트 실행 후 `BUILD SUCCESSFUL`이 출력됩니다.
 
-## 7. 결과 확인 방법(스크린샷 포함)
+## 7. 결과 확인 방법
 
 - 성공 기준:
   - `GET /mission04/task03/members/new`에서 회원 가입 폼과 검증 규칙 안내가 함께 보입니다.

@@ -584,7 +584,7 @@ curl "http://localhost:8080/mission04/task02/view-resolver?name=%EA%B9%80%EC%8A%
   - 애플리케이션 실행 시 `/mission04/task02/view-resolver` 요청에 HTML 화면이 반환됩니다.
   - 테스트 실행 시 `BUILD SUCCESSFUL`이 출력됩니다.
 
-## 7. 결과 확인 방법(스크린샷 포함)
+## 7. 결과 확인 방법
 
 - 성공 기준:
   - 화면 상단에 `View Resolver 설정과 활용` 제목이 보입니다.
@@ -595,10 +595,7 @@ curl "http://localhost:8080/mission04/task02/view-resolver?name=%EA%B9%80%EC%8A%
   - 브라우저로 `GET /mission04/task02/view-resolver` 호출
   - 브라우저로 `GET /mission04/task02/view-resolver?name=김스프링` 호출
   - 터미널에서는 `curl` 응답 HTML 안에 논리 뷰 이름과 템플릿 경로 문자열이 포함되는지 확인
-- 스크린샷 파일명과 저장 위치:
-  - 현재 저장소에는 스크린샷 파일을 추가하지 않았습니다.
-  - 재현 캡처가 필요하면 `view-resolver-page.png` 파일명으로 저장하고 경로는 `docs/mission-04-spring-mvc/task-02-view-resolver/view-resolver-page.png`를 사용하면 됩니다.
-
+  
 ## 8. 학습 내용
 
 - 스프링 MVC에서 컨트롤러는 보통 템플릿의 실제 파일 경로를 직접 반환하지 않고, 논리 뷰 이름만 반환합니다. 이렇게 하면 컨트롤러는 요청 처리와 모델 구성에 집중하고, 어떤 템플릿 기술을 쓸지는 View Resolver와 설정이 담당합니다.

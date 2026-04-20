@@ -517,7 +517,7 @@ curl "http://localhost:8080/mission04/task09/logs/requests?topic=request-log"
 - 콘솔 로그에 `[Task09Filter]`, `[Task09Interceptor]` 접두사가 포함된 메시지가 출력됩니다.
 - task05 요청 테스트에서는 task09 로깅 접두사가 출력되지 않습니다.
 
-## 7. 결과 확인 방법(스크린샷 포함)
+## 7. 결과 확인 방법
 
 - 성공 기준:
   - `GET /mission04/task09/logs/requests` 호출 시 200 OK와 JSON 응답이 반환됩니다.

@@ -849,7 +849,7 @@ curl "http://localhost:8080/mission04/task11/products?category=cloud"
 - 기본 목록 테스트가 뷰 이름, 모델 데이터, HTML 렌더링 문구를 검증합니다.
 - 카테고리 필터 테스트가 Cloud 제품만 반복 출력되는지 확인합니다.
 
-## 7. 결과 확인 방법(스크린샷 포함)
+## 7. 결과 확인 방법
 
 - 성공 기준:
   - `/mission04/task11/products` 접속 시 제품 카드 5개가 렌더링됩니다.
@@ -865,10 +865,6 @@ GET /mission04/task11/products?category=cloud
 -> HTML 응답 본문에 "클라우드 배포 체크리스트", "API Gateway 패턴 노트" 문자열 포함
 -> HTML 응답 본문에 "JPA 빠른 시작" 문자열 미포함
 ```
-
-- 스크린샷 파일명과 저장 위치:
-  - 전체 목록 화면 캡처: `task11-product-catalog-all.png`, 저장 위치 `docs/mission-04-spring-mvc/task-11-view-template-data-output/task11-product-catalog-all.png`
-  - Cloud 필터 화면 캡처: `task11-product-catalog-cloud.png`, 저장 위치 `docs/mission-04-spring-mvc/task-11-view-template-data-output/task11-product-catalog-cloud.png`
 
 ## 8. 학습 내용
 

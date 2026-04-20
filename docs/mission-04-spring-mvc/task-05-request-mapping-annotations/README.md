@@ -566,7 +566,7 @@ curl -i http://localhost:8080/mission04/task05/products
 - 예상 결과:
   - `BUILD SUCCESSFUL` 출력
 
-## 7. 결과 확인 방법(스크린샷 포함)
+## 7. 결과 확인 방법
 
 - 성공 기준:
   - `GET /mission04/task05/products`가 현재 제품 목록을 `200 OK`로 반환합니다.

@@ -238,7 +238,7 @@ curl -i "http://localhost:8080/mission04/task02/view-resolver?name=%EA%B9%80%EC%
   - 기존 View Resolver 예제 화면이 정상 동작하는지 검증하는 테스트가 통과합니다.
   - 문서 전용 태스크이므로 별도 Java 테스트 파일은 추가하지 않았습니다.
 
-## 7. 결과 확인 방법(스크린샷 포함)
+## 7. 결과 확인 방법
 
 - 성공 기준:
   - 다이어그램에서 요청이 `DispatcherServlet`을 시작점으로 컨트롤러, `ViewResolver`, `View`를 거쳐 응답으로 이어지는 순서가 드러납니다.
@@ -247,10 +247,9 @@ curl -i "http://localhost:8080/mission04/task02/view-resolver?name=%EA%B9%80%EC%
 - API/화면 확인 방법:
   - 브라우저와 `curl`로 `GET /mission04/task02/view-resolver` 요청을 호출합니다.
   - 개발자도구 Network 탭에서 요청 1건과 응답 HTML을 확인합니다.
-- 스크린샷 파일명과 저장 위치:
-  - 현재 저장소에는 스크린샷 파일을 추가하지 않았습니다.
-  - 흐름 다이어그램 캡처는 `spring-mvc-request-response-flow.png` 파일명으로 `docs/mission-04-spring-mvc/task-04-request-response-flow/spring-mvc-request-response-flow.png` 경로에 저장하면 됩니다.
-  - 브라우저 결과 화면 캡처는 `spring-mvc-response-page.png` 파일명으로 `docs/mission-04-spring-mvc/task-04-request-response-flow/spring-mvc-response-page.png` 경로에 저장하면 됩니다.
+- 스크린샷 :
+  - 흐름 다이어그램 캡처 
+  - ![img.png](img.png)
 
 ## 8. 학습 내용
 

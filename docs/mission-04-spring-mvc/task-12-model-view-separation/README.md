@@ -646,7 +646,7 @@ curl "http://localhost:8080/mission04/task12/model-view?name=%EA%B9%80%EB%AA%A8%
 - 기본 요청 테스트가 뷰 이름, 기본 Model 데이터, HTML 문구를 검증합니다.
 - 이름 파라미터 테스트가 같은 뷰에서 출력 메시지만 달라지는지 확인합니다.
 
-## 7. 결과 확인 방법(스크린샷 포함)
+## 7. 결과 확인 방법
 
 - 성공 기준:
   - `/mission04/task12/model-view` 접속 시 학습 주제, 멘토, 목표, 날짜, 핵심 데이터 목록, 체크리스트가 한 화면에 렌더링됩니다.
@@ -661,10 +661,6 @@ GET /mission04/task12/model-view
 GET /mission04/task12/model-view?name=김모델
 -> HTML 응답 본문에 "김모델님, 컨트롤러는 데이터를 준비하고 View는 표현을 담당합니다." 포함
 ```
-
-- 스크린샷 파일명과 저장 위치:
-  - 기본 화면 캡처: `task12-model-view-default.png`, 저장 위치 `docs/mission-04-spring-mvc/task-12-model-view-separation/task12-model-view-default.png`
-  - 이름 파라미터 화면 캡처: `task12-model-view-custom-name.png`, 저장 위치 `docs/mission-04-spring-mvc/task-12-model-view-separation/task12-model-view-custom-name.png`
 
 ## 8. 학습 내용
 

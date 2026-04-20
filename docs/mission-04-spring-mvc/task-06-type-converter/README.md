@@ -393,7 +393,7 @@ curl -i "http://localhost:8080/mission04/task06/schedules?date=2026-03-19"
 - 예상 결과:
   - `BUILD SUCCESSFUL` 출력
 
-## 7. 결과 확인 방법(스크린샷 포함)
+## 7. 결과 확인 방법
 
 - 성공 기준:
   - `date=20260319` 요청 시 날짜 문자열이 `LocalDate`로 변환된 결과가 JSON 응답에 반영됩니다.

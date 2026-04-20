@@ -682,13 +682,21 @@ open docs/mission-04-spring-mvc/task-08-dispatcher-servlet-summary/dispatcher-se
   - 1페이지에는 초기화와 전체 구조, 2페이지에는 요청 처리와 응답 반환 요약이 포함됩니다.
   - DispatcherServlet이 단순 서블릿이 아니라 MVC 전략 객체를 조정하는 중심 컴포넌트라는 메시지가 드러납니다.
 - 결과 확인 파일:
-  - 제출용 PDF: `docs/mission-04-spring-mvc/task-08-dispatcher-servlet-summary/mission04-task08-dispatcher-servlet-summary.pdf`
-  - 미리보기 이미지 1: `docs/mission-04-spring-mvc/task-08-dispatcher-servlet-summary/dispatcher-servlet-summary-page-1-preview.png`
-  - 미리보기 이미지 2: `docs/mission-04-spring-mvc/task-08-dispatcher-servlet-summary/dispatcher-servlet-summary-page-2-preview.png`
+  - 제출용 PDF: `./mission04-task08-dispatcher-servlet-summary.pdf`
+  - 미리보기 이미지 1: `./dispatcher-servlet-summary-page-1-preview.png`
+  - 미리보기 이미지 2: `./dispatcher-servlet-summary-page-2-preview.png`
 - 스크린샷 파일명과 저장 위치:
   - `dispatcher-servlet-summary-page-1-preview.png`
   - `dispatcher-servlet-summary-page-2-preview.png`
-  - 저장 위치: `docs/mission-04-spring-mvc/task-08-dispatcher-servlet-summary/`
+  - 저장 위치: `./`
+
+### 7.1 1페이지 미리보기
+
+![DispatcherServlet 요약 1페이지 미리보기](./dispatcher-servlet-summary-page-1-preview.png)
+
+### 7.2 2페이지 미리보기
+
+![DispatcherServlet 요약 2페이지 미리보기](./dispatcher-servlet-summary-page-2-preview.png)
 
 ## 8. 학습 내용
 
