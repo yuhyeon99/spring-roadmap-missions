@@ -1,0 +1,6 @@
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Tue, 21 Apr 2026 07:10:58 GMT
+
+[{"id":1,"title":"스프링 입문","author":"김스프링","level":"BEGINNER"},{"id":2,"title":"JdbcTemplate 핵심","author":"이데이터","level":"INTERMEDIATE"},{"id":3,"title":"트랜잭션 실전","author":"박트랜잭션","level":"ADVANCED"}]
