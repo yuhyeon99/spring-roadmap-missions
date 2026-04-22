@@ -468,7 +468,7 @@ Consider enabling configuration cache to speed up this build: https://docs.gradl
 - 콘솔 마지막에 `BUILD SUCCESSFUL`이 출력됩니다.
 - HTML 테스트 리포트는 `build/reports/tests/test/index.html`에서 확인할 수 있습니다.
 
-## 7. 결과 확인 방법(스크린샷 포함)
+## 7. 결과 확인 방법
 
 - 성공 기준:
 - `registerWithinCapacityCommitsTransaction()`에서 워크숍 신청 수가 `1`로 남으면 정상 커밋입니다.
@@ -479,8 +479,6 @@ Consider enabling configuration cache to speed up this build: https://docs.gradl
 - 저장 위치: `./task04-gradle-test-output.txt`
 - 추가 확인 경로:
 - HTML 테스트 리포트: `build/reports/tests/test/index.html`
-- 스크린샷:
-- 이번 태스크는 테스트 코드와 콘솔 출력 중심이라 별도 이미지 스크린샷은 만들지 않았습니다.
 
 ## 8. 학습 내용
 

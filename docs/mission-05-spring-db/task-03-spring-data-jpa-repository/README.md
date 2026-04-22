@@ -702,7 +702,7 @@ curl -i -X DELETE http://localhost:8080/mission05/task03/users/1
 - 콘솔 마지막에 `BUILD SUCCESSFUL`이 출력됩니다.
 - HTML 테스트 리포트는 `build/reports/tests/test/index.html`에서 확인할 수 있습니다.
 
-## 7. 결과 확인 방법(스크린샷 포함)
+## 7. 결과 확인 방법
 
 - 성공 기준:
 - 생성 응답에 `201 Created`, `Location: /mission05/task03/users/{id}`가 포함되면 저장이 성공한 것입니다.
@@ -714,8 +714,6 @@ curl -i -X DELETE http://localhost:8080/mission05/task03/users/1
 - 저장 위치: `docs/mission-05-spring-db/task-03-spring-data-jpa-repository/task03-gradle-test-output.txt`
 - 추가 확인 경로:
 - HTML 테스트 리포트: `build/reports/tests/test/index.html`
-- 스크린샷:
-- 이번 태스크는 REST API 응답과 테스트 출력 중심이라 별도 이미지 스크린샷은 만들지 않았습니다.
 
 ## 8. 학습 내용
 
