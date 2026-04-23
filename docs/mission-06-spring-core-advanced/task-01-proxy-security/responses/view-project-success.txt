@@ -1,0 +1,6 @@
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Thu, 23 Apr 2026 12:36:44 GMT
+
+{"action":"프로젝트 조회","projectId":"project-alpha","proxyApplied":true,"requestedBy":"analyst-kim","requestedRole":"USER","requiredRole":"USER","resultMessage":"프로젝트 project-alpha의 운영 상태와 배포 이력을 조회했습니다.","securityChecks":["프록시 진입: 프로젝트 조회","인증 검사 시작: 사용자=analyst-kim","인증 성공","권한 검사 시작: 요청 역할=USER, 필요 역할=USER","권한 승인","대상 서비스 호출 전","대상 서비스 호출 후","사후 보안 로그 기록 완료"]}
