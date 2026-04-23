@@ -885,7 +885,7 @@ curl -X POST "http://localhost:8080/mission06/task03/template-method/jobs/unknow
 - `BUILD SUCCESSFUL`
 - 템플릿 메서드 `final` 여부, 두 작업 타입의 개별 단계 차이, 예외 흐름이 모두 통과합니다.
 
-## 7. 결과 확인 방법(스크린샷 포함)
+## 7. 결과 확인 방법
 
 - 성공 기준:
   - 작업 목록 조회 시 지원 작업 타입이 두 개 반환되어야 합니다.
@@ -896,13 +896,12 @@ curl -X POST "http://localhost:8080/mission06/task03/template-method/jobs/unknow
 - 응답 스냅샷 파일:
   - `docs/mission-06-spring-core-advanced/task-03-template-method/responses/job-catalog.txt`
   - `docs/mission-06-spring-core-advanced/task-03-template-method/responses/cache-warmup-success.txt`
-  - `docs/mission-06-spring-core-advanced/task-03-template-method/responses/report-publish-success.txt`
+  - `docs/mission-06-spring-core-advanced/task-03-
+  - template-method/responses/report-publish-success.txt`
   - `docs/mission-06-spring-core-advanced/task-03-template-method/responses/unknown-job-error.txt`
 
 - 테스트 로그 파일:
   - `docs/mission-06-spring-core-advanced/task-03-template-method/task03-gradle-test-output.txt`
-
-- 이번 태스크는 브라우저 이미지 캡처 없이 API 응답 스냅샷 텍스트로 실행 결과를 재현 가능하게 남겼습니다.
 
 ## 8. 학습 내용
 
