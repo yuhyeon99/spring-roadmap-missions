@@ -1,0 +1,23 @@
+[TX-BEGIN] id=TX-1001 method=settleWithFailure
+[TX-STATUS] id=TX-1001 phase=ACTIVE active=true detail=트랜잭션 시작 직후 상태 점검
+[BUSINESS] 주문 정산 시작: orderId=order-7002 amount=33000 operator=batch-admin
+[BUSINESS] 정산 데이터 검증 완료
+[BUSINESS] 외부 원장 반영 중 오류 감지
+[TX-ROLLBACK] id=TX-1001 reason=외부 원장 반영 실패로 트랜잭션을 롤백합니다.
+[TX-STATUS] id=TX-1001 phase=ROLLED_BACK active=false detail=롤백 후 상태 점검
+[TX-BEGIN] id=TX-1002 method=settle
+[TX-STATUS] id=TX-1002 phase=ACTIVE active=true detail=트랜잭션 시작 직후 상태 점검
+[BUSINESS] 주문 정산 시작: orderId=order-7001 amount=42000 operator=batch-admin
+[BUSINESS] 정산 데이터 검증 완료
+[BUSINESS] 원장 반영 완료
+[TX-STATUS] id=TX-1002 phase=ACTIVE active=true detail=비즈니스 로직 실행 완료
+[TX-COMMIT] id=TX-1002 message=정상 커밋 완료
+[TX-STATUS] id=TX-1002 phase=COMMITTED active=false detail=커밋 후 상태 점검
+[TX-BEGIN] id=TX-1003 method=settle
+[TX-STATUS] id=TX-1003 phase=ACTIVE active=true detail=트랜잭션 시작 직후 상태 점검
+[BUSINESS] 주문 정산 시작: orderId=order-7003 amount=51000 operator=qa-batch
+[BUSINESS] 정산 데이터 검증 완료
+[BUSINESS] 원장 반영 완료
+[TX-STATUS] id=TX-1003 phase=ACTIVE active=true detail=비즈니스 로직 실행 완료
+[TX-COMMIT] id=TX-1003 message=정상 커밋 완료
+[TX-STATUS] id=TX-1003 phase=COMMITTED active=false detail=커밋 후 상태 점검

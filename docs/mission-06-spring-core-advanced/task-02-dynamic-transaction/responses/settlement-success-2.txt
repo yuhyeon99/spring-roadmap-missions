@@ -1,0 +1,6 @@
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Thu, 23 Apr 2026 12:54:27 GMT
+
+{"orderId":"order-7003","amount":51000,"operator":"qa-batch","businessStatus":"SETTLEMENT_COMPLETED","message":"주문 정산이 정상적으로 커밋되었습니다.","transaction":{"transactionId":"TX-1003","methodName":"settle","phase":"COMMITTED","active":false,"detail":"커밋 후 상태 점검","failureReason":null,"events":["[TX-BEGIN] id=TX-1003 method=settle","[TX-STATUS] id=TX-1003 phase=ACTIVE active=true detail=트랜잭션 시작 직후 상태 점검","[TX-STATUS] id=TX-1003 phase=ACTIVE active=true detail=비즈니스 로직 실행 완료","[TX-COMMIT] id=TX-1003 message=정상 커밋 완료","[TX-STATUS] id=TX-1003 phase=COMMITTED active=false detail=커밋 후 상태 점검"]}}
