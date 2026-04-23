@@ -1,0 +1,7 @@
+HTTP/1.1 400 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Thu, 23 Apr 2026 13:16:52 GMT
+Connection: close
+
+{"status":400,"error":"BAD_REQUEST","message":"지원하지 않는 jobType 입니다. 사용 가능 값: cache-warmup, report-publish","path":"/mission06/task03/template-method/jobs/unknown/run"}

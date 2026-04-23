@@ -1,0 +1,6 @@
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Thu, 23 Apr 2026 13:16:52 GMT
+
+{"jobType":"report-publish","jobName":"보고서 발행 작업","target":"monthly-sales","operator":"data-lee","status":"SUCCESS","resultMessage":"monthly-sales 보고서를 생성하고 구독자 채널로 발행했습니다.","steps":["1. 공통 시작 단계: jobType=report-publish, operator=data-lee","2. 공통 입력 검증 완료","3. 개별 검증 단계: 보고서 식별자와 발행 범위 확인 완료","4. 개별 준비 단계: 보고서 메타데이터와 구독자 목록 로딩","5. 공통 본 실행 단계 진입","6. 개별 실행 단계: PDF 생성 후 구독자에게 발행","7. 개별 후처리 단계: 발행 이력과 재시도 메타데이터 저장","8. 공통 종료 단계: 결과 응답 조합 완료"]}

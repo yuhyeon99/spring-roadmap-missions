@@ -1,0 +1,6 @@
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Thu, 23 Apr 2026 13:16:52 GMT
+
+{"templateMethodDefinition":"공통 시작 -> 공통 검증 -> 개별 검증 -> 개별 준비 -> 공통 본 실행 -> 개별 실행 -> 개별 후처리 -> 공통 종료","supportedJobTypes":["cache-warmup","report-publish"]}
