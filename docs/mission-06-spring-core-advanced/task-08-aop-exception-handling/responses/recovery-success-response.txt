@@ -1,0 +1,6 @@
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Mon, 27 Apr 2026 04:33:48 GMT
+
+{"incidentId":"incident-101","operatorId":"ops-engineer","status":"RECOVERY_COMPLETED","executedSteps":["장애 원인 분석 리포트를 조회했습니다.","복구 스크립트 실행 조건을 점검했습니다.","운영자 승인 후 복구 작업을 완료했습니다."],"alertCount":0}

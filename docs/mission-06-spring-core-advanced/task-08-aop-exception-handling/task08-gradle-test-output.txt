@@ -1,0 +1,8 @@
+명령: ./gradlew test --tests com.goorm.springmissionsplayground.mission06_spring_core_advanced.task08_aop_exception_handling.AopExceptionHandlingControllerTest
+실행 일시: 2026-04-27 13:32:52 KST
+
+주요 결과:
+- compileJava / compileTestJava / test 작업 정상 수행
+- AopExceptionHandlingControllerTest 전체 통과
+- BUILD SUCCESSFUL in 5s
+- 4 actionable tasks: 3 executed, 1 up-to-date

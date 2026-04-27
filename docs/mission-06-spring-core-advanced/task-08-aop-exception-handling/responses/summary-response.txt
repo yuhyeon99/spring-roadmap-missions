@@ -1,0 +1,6 @@
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Mon, 27 Apr 2026 04:33:48 GMT
+
+{"summary":"스프링 AOP는 예외가 발생한 지점을 공통 관심사로 분리해 로깅, 알림, 감사 기록을 한곳에서 처리할 수 있습니다.","keywords":["Join Point","Pointcut","Advice","AfterThrowing","Proxy"],"notes":["@AfterThrowing은 대상 메서드가 예외를 던진 직후 실행됩니다.","비즈니스 서비스는 예외를 던지는 책임에 집중하고, 공통 대응은 Aspect가 맡습니다.","예외 알림 로직을 서비스마다 복붙하지 않아도 되어 변경 비용이 줄어듭니다."]}
