@@ -1,0 +1,1 @@
+{"status":403,"error":"FORBIDDEN","message":"운영 배포 승인 작업에는 ADMIN 권한이 필요합니다.","path":"/mission06/task06/aop-concepts/deployment-plans/plan-red/approval"}

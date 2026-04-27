@@ -1,0 +1,1 @@
+{"missionTopic":"스프링 AOP는 프록시를 통해 공통 관심사를 비즈니스 코드 밖으로 분리합니다.","keywords":["Aspect","Advice","Pointcut","JoinPoint","Proxy"],"notes":["JoinPoint는 메서드 실행 지점을 의미합니다.","Pointcut은 어떤 메서드에 Advice를 적용할지 고르는 규칙입니다.","Spring AOP는 프록시 기반이라 self-invocation은 기본적으로 가로채지 못합니다."]}
